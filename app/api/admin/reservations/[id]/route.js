@@ -1,26 +1,23 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { supabase } from '@/app/lib/supabase';
 
 // GET /api/admin/reservations/[id] - Dohvati pojedinačnu rezervaciju
 export async function GET(request, { params }) {
   try {
     const { id } = params;
-    const reservation = await prisma.reservation.findUnique({
-      where: { id: parseInt(id) }
-    });
+    const { data: reservation, error } = await supabase
+      .from('reservations')
+      .select('*')
+      .eq('id', parseInt(id))
+      .single();
 
-    if (!reservation) {
-      return NextResponse.json(
-        { error: 'Rezervacija nije pronađena' },
-        { status: 404 }
-      );
-    }
+    if (error) throw error;
 
-    return NextResponse.json({ reservation });
+    return NextResponse.json(reservation);
   } catch (error) {
     console.error('Error fetching reservation:', error);
     return NextResponse.json(
-      { error: 'Greška pri dohvaćanju rezervacije' },
+      { error: error.message },
       { status: 500 }
     );
   }
@@ -40,16 +37,20 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    const reservation = await prisma.reservation.update({
-      where: { id: parseInt(id) },
-      data
-    });
+    const { data: updatedReservation, error } = await supabase
+      .from('reservations')
+      .update(data)
+      .eq('id', parseInt(id))
+      .select()
+      .single();
 
-    return NextResponse.json({ reservation });
+    if (error) throw error;
+
+    return NextResponse.json(updatedReservation);
   } catch (error) {
     console.error('Error updating reservation:', error);
     return NextResponse.json(
-      { error: 'Greška pri ažuriranju rezervacije' },
+      { error: error.message },
       { status: 500 }
     );
   }
@@ -59,16 +60,18 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const { id } = params;
+    const { error } = await supabase
+      .from('reservations')
+      .delete()
+      .eq('id', parseInt(id));
 
-    await prisma.reservation.delete({
-      where: { id: parseInt(id) }
-    });
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting reservation:', error);
     return NextResponse.json(
-      { error: 'Greška pri brisanju rezervacije' },
+      { error: error.message },
       { status: 500 }
     );
   }

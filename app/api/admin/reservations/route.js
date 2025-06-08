@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { supabase } from '@/app/lib/supabase';
 
 // GET /api/admin/reservations - Dohvati sve rezervacije
 export async function GET() {
   try {
-    const reservations = await prisma.reservation.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+    const { data: reservations, error } = await supabase
+      .from('reservations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    return NextResponse.json({ reservations });
+    if (error) throw error;
+
+    return NextResponse.json(reservations);
   } catch (error) {
     console.error('Error fetching reservations:', error);
     return NextResponse.json(
-      { error: 'Greška pri dohvaćanju rezervacija' },
+      { error: error.message },
       { status: 500 }
     );
   }
@@ -33,10 +34,14 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    const reservation = await prisma.reservation.update({
-      where: { id: parseInt(id) },
-      data: { status }
-    });
+    const { data: reservation, error } = await supabase
+      .from('reservations')
+      .update({ status })
+      .eq('id', parseInt(id))
+      .select()
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json({ reservation });
   } catch (error) {
@@ -53,9 +58,14 @@ export async function DELETE(request, { params }) {
   try {
     const { id } = params;
 
-    await prisma.reservation.delete({
-      where: { id: parseInt(id) }
-    });
+    const { data: reservation, error } = await supabase
+      .from('reservations')
+      .delete()
+      .eq('id', parseInt(id))
+      .select()
+      .single();
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -64,5 +74,22 @@ export async function DELETE(request, { params }) {
       { error: 'Greška pri brisanju rezervacije' },
       { status: 500 }
     );
+  }
+}
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { data: reservation, error } = await supabase
+      .from('reservations')
+      .insert([body])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json(reservation);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 } 
