@@ -64,7 +64,7 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-[#5C4033]/80 italic">
-                "{testimonial.text}"
+                &ldquo;{testimonial.text}&rdquo;
               </p>
             </div>
           ))}

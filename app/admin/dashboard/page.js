@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/app/lib/supabase';
 import { Playfair_Display } from 'next/font/google';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -271,15 +272,9 @@ export default function AdminDashboard() {
               <p className="text-gray-600">
                 Upravljanje rezervacijama za penzionere
               </p>
-              <a 
-                href="/" 
-                className="text-sm text-[#ffd700] hover:text-[#ffd700]/80 mt-1 inline-flex items-center"
-              >
-                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Povratak na web stranicu
-              </a>
+              <Link href="/" className="text-sm text-[#009641] hover:text-[#009641]/80 mt-1 inline-flex items-center">
+                ← Povratak na početnu
+              </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
