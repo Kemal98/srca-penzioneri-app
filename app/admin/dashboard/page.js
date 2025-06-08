@@ -257,14 +257,14 @@ export default function AdminDashboard() {
         {/* Header with Logo and Title */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <a href="/" className="w-16 h-16 relative block">
+            <Link href="/" className="w-16 h-16 relative block">
               <Image
                 src="/images/slike/logo.png"
                 alt="Ajdinovica Logo"
                 fill
                 className="object-contain"
               />
-            </a>
+            </Link>
             <div>
               <h1 className={`text-3xl ${playfair.className} font-bold text-gray-900 mb-2`}>
                 Ajdinovica - Admin Panel
