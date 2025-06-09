@@ -38,7 +38,9 @@ export default function Home() {
     checkOut: '',
     guests: '1',
     roomType: 'standard',
-    specialRequests: ''
+    specialRequests: '',
+    country: '',
+    action: ''
   });
   const [formStatus, setFormStatus] = useState({
     loading: false,
@@ -120,90 +122,79 @@ export default function Home() {
 
     try {
       // Validacija podataka
-      if (!reservationData.name || !reservationData.email || !reservationData.phone || !reservationData.checkIn || !reservationData.checkOut || !reservationData.guests) {
+      if (!reservationData.name || !reservationData.phone || !reservationData.country) {
         throw new Error('Molimo popunite sva obavezna polja');
       }
 
-      console.log('Form data before submission:', reservationData);
+      // Ako je rezervacija, provjeri dodatna polja
+      if (reservationData.action === 'reservation') {
+        if (!reservationData.checkIn || !reservationData.checkOut || !reservationData.roomType) {
+          throw new Error('Molimo popunite sva polja za rezervaciju (datume dolaska, odlaska i tip smještaja)');
+        }
+      }
 
       const data = {
         name: reservationData.name,
-        email: reservationData.email,
         phone: reservationData.phone,
-        check_in: reservationData.checkIn,
-        check_out: reservationData.checkOut,
-        guests: parseInt(reservationData.guests),
-        message: reservationData.specialRequests || '',
-        status: 'pending'
+        email: reservationData.email || '',
+        country: reservationData.country,
+        action: reservationData.action || 'info',
+        status: 'pending',
+        created_at: new Date().toISOString()
       };
 
-      console.log('Sending reservation data:', data);
-
-      // Prvo provjerimo da li možemo pristupiti tabeli
-      console.log('Testing table access...');
-      const { data: testData, error: testError } = await supabase
-        .from('reservations')
-        .select('count')
-        .single();
-
-      if (testError) {
-        console.error('Error accessing reservations table:', {
-          message: testError.message,
-          details: testError.details,
-          hint: testError.hint,
-          code: testError.code
+      // Dodaj polja za rezervaciju ako je action = 'reservation'
+      if (reservationData.action === 'reservation') {
+        Object.assign(data, {
+          check_in: reservationData.checkIn,
+          check_out: reservationData.checkOut,
+          room_type: reservationData.roomType,
+          guests: reservationData.guests || '1',
+          special_requests: reservationData.specialRequests || ''
         });
-        throw new Error('Problem pristupa bazi podataka');
       }
 
-      console.log('Successfully accessed reservations table');
-
-      // Pokušavamo spremiti rezervaciju
-      console.log('Attempting to insert reservation...');
-      const { data: insertData, error: insertError } = await supabase
-        .from('reservations')
-        .insert([data])
-        .select();
+      // Pokušavamo spremiti podatke
+      const tableName = reservationData.action === 'reservation' ? 'reservations' : 'contacts';
+      const { error: insertError } = await supabase
+        .from(tableName)
+        .insert([data]);
 
       if (insertError) {
-        console.error('Supabase error details:', {
-          message: insertError.message,
-          details: insertError.details,
-          hint: insertError.hint,
-          code: insertError.code
-        });
-        throw new Error(`Greška prilikom spremanja rezervacije: ${insertError.message}`);
+        console.error('Greška Supabase:', insertError);
+        if (insertError.code === '42P01') {
+          throw new Error('Tabela ne postoji. Molimo kontaktirajte administratora.');
+        }
+        throw new Error('Došlo je do greške prilikom slanja podataka. Molimo pokušajte ponovo.');
       }
 
-      if (!insertData || insertData.length === 0) {
-        throw new Error('Rezervacija nije uspješno spremljena');
-      }
-
-      console.log('Reservation saved successfully:', insertData);
-      
       setFormStatus({ loading: false, success: true, error: null });
+      
+      // Reset form data
       setReservationData({
         name: '',
         email: '',
         phone: '',
+        country: '',
+        action: '',
         checkIn: '',
         checkOut: '',
+        roomType: '',
         guests: '1',
-        roomType: 'standard',
         specialRequests: ''
       });
-      
-      // Zatvori formu nakon 3 sekunde
-      setTimeout(() => {
+
+      // Zatvori modal ako je otvoren
+      if (showReservationForm) {
         setShowReservationForm(false);
-        setFormStatus({ loading: false, success: false, error: null });
-      }, 3000);
+      }
+      
     } catch (error) {
-      console.error('Error in form submission:', error);
+      console.error('Greška u slanju forme:', error);
       setFormStatus({ 
         loading: false, 
         success: false, 
-        error: error.message || 'Došlo je do greške prilikom slanja rezervacije. Molimo pokušajte ponovo.' 
+        error: error.message || 'Došlo je do greške prilikom slanja podataka. Molimo pokušajte ponovo.' 
       });
     }
   };
@@ -818,133 +809,179 @@ export default function Home() {
             <h2 className={`text-2xl md:text-3xl ${playfair.className} text-gray-900 mb-2`}>
               Zatražite poziv i saznajte sve <span className="bg-[#009641] text-white px-2">bez obaveza</span>
             </h2>
-            <p className="text-base text-gray-600">Naš tim će vas nazvati, objasniti ponudu i pomoći vam da rezervišete bez stresa. Sve informacije su besplatne i bez obaveza.</p>
+            <p className="text-base text-gray-600 mb-8">
+              Naša recepcija će vas pozvati i objasniti sve što vas zanima. Sve informacije su besplatne i bez obaveza.
+            </p>
 
-            <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                  type="text"
-                  placeholder="Ime"
-                  name="name"
-                  value={reservationData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  name="email"
-                  value={reservationData.email}
-                  onChange={handleInputChange}
-                  required
-                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                />
-                <input
-                  type="tel"
-                  placeholder="Broj telefona"
-                  name="phone"
-                  value={reservationData.phone}
-                  onChange={handleInputChange}
-                  required
-                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                />
+            <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <button
+                  onClick={() => setFormStatus({ ...formStatus, action: 'info' })}
+                  className={`p-4 rounded-xl text-center transition-all ${
+                    formStatus.action === 'info'
+                      ? 'bg-[#009641] text-white'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  Želim da me pozovete
+                </button>
+                <button
+                  onClick={() => setFormStatus({ ...formStatus, action: 'reservation' })}
+                  className={`p-4 rounded-xl text-center transition-all ${
+                    formStatus.action === 'reservation'
+                      ? 'bg-[#009641] text-white'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Želim rezervaciju
+                </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Dolazak</label>
+
+              <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
-                    type="date"
-                    name="checkIn"
-                    value={reservationData.checkIn}
+                    type="text"
+                    placeholder="Ime i prezime"
+                    name="name"
+                    value={reservationData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Odlazak</label>
                   <input
-                    type="date"
-                    name="checkOut"
-                    value={reservationData.checkOut}
+                    type="tel"
+                    placeholder="Broj telefona"
+                    name="phone"
+                    value={reservationData.phone}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Broj gostiju</label>
-                <select
-                  name="guests"
-                  value={reservationData.guests}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                >
-                  {[1,2,3,4,5,6].map(num => (
-                    <option key={num} value={num}>{num} {num === 1 ? 'osoba' : 'osobe'}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tip smještaja</label>
-                <select
-                  name="roomType"
-                  value={reservationData.roomType}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                >
-                  <option value="standard">Standardna soba</option>
-                  <option value="deluxe">Deluxe soba</option>
-                  <option value="villa">Vikendica</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Posebni zahtjevi</label>
-                <textarea
-                  name="specialRequests"
-                  value={reservationData.specialRequests}
-                  onChange={handleInputChange}
-                  rows="3"
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                  placeholder="Unesite sve posebne zahtjeve ili napomene..."
-                ></textarea>
-              </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="email"
+                    placeholder="Email (opciono)"
+                    name="email"
+                    value={reservationData.email}
+                    onChange={handleInputChange}
+                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                  />
+                  <select
+                    name="country"
+                    value={reservationData.country}
+                    onChange={handleInputChange}
+                    required
+                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                  >
+                    <option value="">Izaberite državu</option>
+                    <option value="BiH">Bosna i Hercegovina</option>
+                    <option value="HR">Hrvatska</option>
+                    <option value="RS">Srbija</option>
+                    <option value="ME">Crna Gora</option>
+                    <option value="SI">Slovenija</option>
+                    <option value="other">Ostalo</option>
+                  </select>
+                </div>
+
+                {formStatus.action === 'reservation' && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <input
+                        type="date"
+                        name="check_in"
+                        value={reservationData.check_in}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                      />
+                      <input
+                        type="date"
+                        name="check_out"
+                        value={reservationData.check_out}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <input
+                        type="number"
+                        name="guests"
+                        value={reservationData.guests}
+                        onChange={handleInputChange}
+                        required
+                        min="1"
+                        placeholder="Broj gostiju"
+                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                      />
+                      <select
+                        name="roomType"
+                        value={reservationData.roomType}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                      >
+                        <option value="">Odaberite tip smještaja</option>
+                        <optgroup label="Premium smještaj (45 EUR/noć)">
+                          <option value="lux-apartment">LUX Apartmani</option>
+                          <option value="hotel-central">Hotel Central</option>
+                        </optgroup>
+                        <optgroup label="Standardni smještaj (33 EUR/noć)">
+                          <option value="bungalow">Bungalovi</option>
+                          <option value="mountain-house">Planinske kuće</option>
+                          <option value="hotel-horizont">Hotel Horizont</option>
+                          <option value="hotel-depadans">Hotel Depadans</option>
+                        </optgroup>
+                      </select>
+                    </div>
+
+                    <textarea
+                      name="special_requests"
+                      value={reservationData.special_requests}
+                      onChange={handleInputChange}
+                      rows="3"
+                      placeholder="Posebni zahtjevi"
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    ></textarea>
+                  </>
+                )}
+
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
+                  >
+                    {formStatus.action === 'info' ? 'Pošalji zahtjev' : 'Rezerviši'}
+                  </button>
+                </div>
+              </form>
 
               {formStatus.error && (
-                <div className="text-red-500 text-sm text-center">{formStatus.error}</div>
+                <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg mt-4">
+                  {formStatus.error}
+                </div>
               )}
 
-              <button
-                type="submit"
-                disabled={formStatus.loading}
-                className={`w-full bg-[#009641] text-white px-8 py-3 rounded-full text-base font-semibold transition-all ${
-                  formStatus.loading 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-[#009641]/90 hover:scale-105 hover:-translate-y-0.5'
-                }`}
-              >
-                {formStatus.loading ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              {formStatus.success && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Slanje rezervacije...
-                  </span>
-                ) : (
-                  'Rezerviši sada'
-                )}
-              </button>
-            </form>
-
-            <div className="mt-8 animate-fade-in delay-300">
-              <a href="#" className="text-gray-600 text-sm hover:text-gray-900 transition-colors duration-300 hover:underline">
-                Preuzmite besplatan vodič: Kako isplanirati siguran i povoljan odmor u penziji
-              </a>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Rezervacija uspješna!</h3>
+                  <p className="text-gray-600">Uskoro ćemo vas kontaktirati za potvrdu.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1078,19 +1115,102 @@ export default function Home() {
                         className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
                       />
                     </div>
-                    <div>
+                    <div className="md:col-span-2">
+                      <div className="bg-[#009641]/10 p-4 rounded-xl mb-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">All-Inclusive ponuda za penzionere</h3>
+                        <p className="text-gray-700 mb-2">Odaberite smještajnu jedinicu sa 50% popusta za penzionere</p>
+                        <div className="flex items-center gap-2 text-[#ff0000] font-bold">
+                          <span className="line-through">90 EUR</span>
+                          <span>→</span>
+                          <span>45 EUR</span>
+                          <span className="text-sm">(Premium smještaj)</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#ff0000] font-bold">
+                          <span className="line-through">66 EUR</span>
+                          <span>→</span>
+                          <span>33 EUR</span>
+                          <span className="text-sm">(Standardni smještaj)</span>
+                        </div>
+                      </div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Tip smještaja</label>
-                      <select
-                        name="roomType"
-                        value={reservationData.roomType}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      >
-                        <option value="standard">Standardna soba</option>
-                        <option value="deluxe">Deluxe soba</option>
-                        <option value="villa">Vikendica</option>
-                      </select>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-4">
+                          <h4 className="font-semibold text-gray-900">Premium smještaj - 45 EUR/noć</h4>
+                          <div className="space-y-2">
+                            <label className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="roomType"
+                                value="lux-apartment"
+                                checked={reservationData.roomType === 'lux-apartment'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                              />
+                              <span className="text-gray-700">LUX Apartmani</span>
+                            </label>
+                            <label className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="roomType"
+                                value="hotel-central"
+                                checked={reservationData.roomType === 'hotel-central'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                              />
+                              <span className="text-gray-700">Hotel Central</span>
+                            </label>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="font-semibold text-gray-900">Standardni smještaj - 33 EUR/noć</h4>
+                          <div className="space-y-2">
+                            <label className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="roomType"
+                                value="bungalow"
+                                checked={reservationData.roomType === 'bungalow'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                              />
+                              <span className="text-gray-700">Bungalovi</span>
+                            </label>
+                            <label className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="roomType"
+                                value="mountain-house"
+                                checked={reservationData.roomType === 'mountain-house'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                              />
+                              <span className="text-gray-700">Planinske kuće</span>
+                            </label>
+                            <label className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="roomType"
+                                value="hotel-horizont"
+                                checked={reservationData.roomType === 'hotel-horizont'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                              />
+                              <span className="text-gray-700">Hotel Horizont</span>
+                            </label>
+                            <label className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="roomType"
+                                value="hotel-depadans"
+                                checked={reservationData.roomType === 'hotel-depadans'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                              />
+                              <span className="text-gray-700">Hotel Depadans</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   

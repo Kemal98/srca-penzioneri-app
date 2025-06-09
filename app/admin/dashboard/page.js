@@ -11,6 +11,7 @@ const playfair = Playfair_Display({ subsets: ['latin'] });
 
 export default function AdminDashboard() {
   const [reservations, setReservations] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedReservation, setSelectedReservation] = useState(null);
@@ -22,12 +23,16 @@ export default function AdminDashboard() {
     cancelled: 0,
     today: 0,
     thisWeek: 0,
-    thisMonth: 0
+    thisMonth: 0,
+    totalContacts: 0
   });
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
-    search: ''
+    search: '',
+    contactType: 'all',
+    contactStatus: 'all',
+    contactDateRange: 'all'
   });
   const [statusChangeModal, setStatusChangeModal] = useState({
     show: false,
@@ -35,6 +40,7 @@ export default function AdminDashboard() {
     newStatus: '',
     note: ''
   });
+  const [activeTab, setActiveTab] = useState('reservations');
   const router = useRouter();
 
   useEffect(() => {
@@ -45,56 +51,80 @@ export default function AdminDashboard() {
       }
     };
 
-    const fetchReservations = async () => {
+    const fetchData = async () => {
       try {
-        console.log('Fetching reservations...'); // Debug log
-        const { data, error } = await supabase
+        console.log('Počinjem učitavanje podataka...'); // Debug log
+        
+        // Fetch reservations
+        const { data: reservationsData, error: reservationsError } = await supabase
           .from('reservations')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (error) {
-          console.error('Supabase error:', error); // Debug log
-          throw error;
+        if (reservationsError) {
+          console.error('Greška pri učitavanju rezervacija:', reservationsError);
+          throw reservationsError;
         }
 
-        console.log('Reservations fetched:', data); // Debug log
-        setReservations(data);
-        calculateStats(data);
+        console.log('Rezervacije uspješno učitane:', reservationsData?.length || 0);
+
+        // Fetch contacts
+        console.log('Učitavam zahtjeve za poziv...'); // Debug log
+        const { data: contactsData, error: contactsError } = await supabase
+          .from('contacts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (contactsError) {
+          console.error('Greška pri učitavanju zahtjeva za poziv:', contactsError);
+          throw contactsError;
+        }
+
+        console.log('Zahtjevi za poziv uspješno učitani:', contactsData?.length || 0);
+        
+        setReservations(reservationsData || []);
+        setContacts(contactsData || []);
+        calculateStats(reservationsData || [], contactsData || []);
       } catch (error) {
-        console.error('Error fetching reservations:', error); // Debug log
+        console.error('Greška pri učitavanju podataka:', error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    const calculateStats = (data) => {
+    const calculateStats = (reservationsData, contactsData) => {
+      console.log('Računam statistiku...', { 
+        reservationsCount: reservationsData?.length || 0,
+        contactsCount: contactsData?.length || 0
+      });
+
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthAgo = new Date(today.getFullYear(), now.getMonth() - 1, now.getDate());
 
       const stats = {
-        total: data.length,
-        pending: data.filter(r => r.status === 'pending').length,
-        confirmed: data.filter(r => r.status === 'confirmed').length,
-        cancelled: data.filter(r => r.status === 'cancelled').length,
-        today: data.filter(r => new Date(r.created_at) >= today).length,
-        thisWeek: data.filter(r => new Date(r.created_at) >= weekAgo).length,
-        thisMonth: data.filter(r => new Date(r.created_at) >= monthAgo).length
+        total: reservationsData?.length || 0,
+        pending: reservationsData?.filter(r => r.status === 'pending')?.length || 0,
+        confirmed: reservationsData?.filter(r => r.status === 'confirmed')?.length || 0,
+        cancelled: reservationsData?.filter(r => r.status === 'cancelled')?.length || 0,
+        today: reservationsData?.filter(r => new Date(r.created_at) >= today)?.length || 0,
+        thisWeek: reservationsData?.filter(r => new Date(r.created_at) >= weekAgo)?.length || 0,
+        thisMonth: reservationsData?.filter(r => new Date(r.created_at) >= monthAgo)?.length || 0,
+        totalContacts: contactsData?.length || 0
       };
 
+      console.log('Statistika izračunata:', stats);
       setStats(stats);
     };
 
     checkAuth();
-    fetchReservations();
+    fetchData();
 
     // Osvježavaj podatke svakih 30 sekundi
-    const interval = setInterval(fetchReservations, 30000);
+    const interval = setInterval(fetchData, 30000);
 
-    // Čisti interval kada se komponenta unmounta
     return () => clearInterval(interval);
   }, [router]);
 
@@ -241,6 +271,109 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
+  const getRoomTypeLabel = (type) => {
+    if (!type) return 'Nije odabrano';
+    
+    const roomTypes = {
+      'lux-apartment': 'LUX Apartmani (45 EUR/noć)',
+      'hotel-central': 'Hotel Central (45 EUR/noć)',
+      'bungalow': 'Bungalovi (33 EUR/noć)',
+      'mountain-house': 'Planinske kuće (33 EUR/noć)',
+      'hotel-horizont': 'Hotel Horizont (33 EUR/noć)',
+      'hotel-depadans': 'Hotel Depadans (33 EUR/noć)'
+    };
+    return roomTypes[type] || type;
+  };
+
+  const updateContactStatus = async (id, newStatus) => {
+    try {
+      console.log('Pokušavam ažurirati status:', { id, newStatus });
+
+      // Prvo provjeri da li kontakt postoji
+      const { data: existingContact, error: fetchError } = await supabase
+        .from('contacts')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) {
+        console.error('Greška pri provjeri kontakta:', fetchError);
+        throw new Error('Kontakt nije pronađen');
+      }
+
+      console.log('Postojeći kontakt:', existingContact);
+
+      // Ažuriraj status kontakta
+      const { data, error: updateError } = await supabase
+        .from('contacts')
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select();
+
+      if (updateError) {
+        console.error('Greška pri ažuriranju statusa:', updateError);
+        throw new Error('Greška pri ažuriranju statusa: ' + updateError.message);
+      }
+
+      console.log('Ažurirani kontakt:', data);
+
+      // Ažuriraj lokalno stanje
+      setContacts(prev => {
+        const updatedContacts = prev.map(contact => 
+          contact.id === id 
+            ? { 
+                ...contact, 
+                status: newStatus,
+                updated_at: new Date().toISOString()
+              }
+            : contact
+        );
+        console.log('Ažurirani kontakti:', updatedContacts);
+        return updatedContacts;
+      });
+
+      // Osvježi podatke nakon uspješnog ažuriranja
+      const { data: refreshedData, error: refreshError } = await supabase
+        .from('contacts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!refreshError && refreshedData) {
+        setContacts(refreshedData);
+        console.log('Podaci osvježeni:', refreshedData);
+      }
+
+      console.log('Status uspješno ažuriran');
+    } catch (error) {
+      console.error('Greška:', error);
+      setError(error.message || 'Greška pri ažuriranju statusa');
+    }
+  };
+
+  // Ažuriraj handleContactStatusChange funkciju
+  const handleContactStatusChange = async (contact, newStatus) => {
+    if (window.confirm(`Da li želite promijeniti status za ${contact.name} u "${newStatus}"?`)) {
+      try {
+        await updateContactStatus(contact.id, newStatus);
+        // Osvježi cijelu listu nakon promjene
+        const { data: refreshedData, error: refreshError } = await supabase
+          .from('contacts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!refreshError && refreshedData) {
+          setContacts(refreshedData);
+        }
+      } catch (error) {
+        console.error('Greška pri promjeni statusa:', error);
+        setError(error.message);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
@@ -343,74 +476,199 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500">Otkazano</h3>
-            <p className="mt-2 text-3xl font-semibold text-red-600">{stats.cancelled}</p>
+            <h3 className="text-sm font-medium text-gray-500">Zahtjevi za poziv</h3>
+            <p className="mt-2 text-3xl font-semibold text-blue-600">{stats.totalContacts}</p>
             <div className="mt-2">
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-red-500 h-2 rounded-full" 
-                  style={{ width: `${(stats.cancelled / stats.total) * 100}%` }}
+                  className="bg-blue-500 h-2 rounded-full" 
+                  style={{ width: `${(stats.totalContacts / (stats.total + stats.totalContacts)) * 100}%` }}
                 ></div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+        {/* Add this after the statistics section and before the tables */}
+        <div className="mb-8">
+          <nav className="flex space-x-4 border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab('reservations')}
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === 'reservations'
+                  ? 'border-b-2 border-[#ffd700] text-[#5C4033]'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Rezervacije
+            </button>
+            <button
+              onClick={() => setActiveTab('contacts')}
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === 'contacts'
+                  ? 'border-b-2 border-[#ffd700] text-[#5C4033]'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Zahtjevi za poziv
+            </button>
+          </nav>
+        </div>
+
+        {/* Replace the existing tables section with this */}
+        {activeTab === 'contacts' ? (
+          <div className="bg-[#FFFDF5] shadow-xl rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+              <h2 className={`text-xl ${playfair.className} font-bold text-[#5C4033]`}>
+                Zahtjevi za poziv
+              </h2>
+              <div className="flex space-x-4">
+                <select
+                  value={filters.contactStatus}
+                  onChange={(e) => setFilters({ ...filters, contactStatus: e.target.value })}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
+                >
+                  <option value="all">Svi statusi</option>
+                  <option value="pending">Na čekanju</option>
+                  <option value="contacted">Kontaktirano</option>
+                  <option value="called">Pozvano</option>
+                </select>
+                <select
+                  value={filters.contactDateRange}
+                  onChange={(e) => setFilters({ ...filters, contactDateRange: e.target.value })}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
+                >
+                  <option value="all">Svi datumi</option>
+                  <option value="today">Danas</option>
+                  <option value="week">Ovaj tjedan</option>
+                  <option value="month">Ovaj mjesec</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
+                      Ime i prezime
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
+                      Kontakt
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
+                      Država
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
                 Status
-              </label>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
+                      Datum i vrijeme
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
+                      Akcije
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {contacts
+                    .filter(contact => {
+                      if (filters.contactStatus !== 'all' && contact.status !== filters.contactStatus) {
+                        return false;
+                      }
+                      const contactDate = new Date(contact.created_at);
+                      const now = new Date();
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                      const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+                      if (filters.contactDateRange === 'today' && contactDate < today) return false;
+                      if (filters.contactDateRange === 'week' && contactDate < weekAgo) return false;
+                      if (filters.contactDateRange === 'month' && contactDate < monthAgo) return false;
+
+                      return true;
+                    })
+                    .map((contact) => (
+                    <tr key={contact.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-[#5C4033]">{contact.name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-[#5C4033]">{contact.email}</div>
+                        <div className="text-sm text-[#5C4033]/80">{contact.phone}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5C4033]">
+                        {contact.country}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <select
+                          value={contact.status || 'pending'}
+                          onChange={(e) => handleContactStatusChange(contact, e.target.value)}
+                          className={`text-sm rounded-md border-gray-300 focus:ring-[#ffd700] focus:border-[#ffd700] ${
+                            contact.status === 'contacted' ? 'bg-blue-50 text-blue-700' :
+                            contact.status === 'called' ? 'bg-green-50 text-green-700' :
+                            'bg-yellow-50 text-yellow-700'
+                          }`}
+                        >
+                          <option value="pending">Na čekanju</option>
+                          <option value="contacted">Kontaktirano</option>
+                          <option value="called">Pozvano</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5C4033]">
+                        {new Date(contact.created_at).toLocaleString('hr-HR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => {
+                            setSelectedReservation(contact);
+                            setShowModal(true);
+                          }}
+                          className="text-[#ffd700] hover:text-[#ffd700]/80"
+                        >
+                          Detalji
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[#FFFDF5] shadow-xl rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+              <h2 className={`text-xl ${playfair.className} font-bold text-[#5C4033]`}>
+                Rezervacije
+              </h2>
+              <div className="flex space-x-4">
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
+                  className="rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
               >
                 <option value="all">Svi statusi</option>
                 <option value="pending">Na čekanju</option>
                 <option value="confirmed">Potvrđeno</option>
                 <option value="cancelled">Otkazano</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Vremenski period
-              </label>
               <select
                 value={filters.dateRange}
                 onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
+                  className="rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
               >
-                <option value="all">Sve rezervacije</option>
+                  <option value="all">Svi datumi</option>
                 <option value="today">Danas</option>
                 <option value="week">Ovaj tjedan</option>
                 <option value="month">Ovaj mjesec</option>
               </select>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Pretraži
-              </label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                placeholder="Ime, email, telefon..."
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#FFFDF5] shadow-xl rounded-lg overflow-hidden">
-          <div className="px-4 py-5 sm:px-6">
-            <h2 className={`text-xl ${playfair.className} font-bold text-[#5C4033]`}>
-              Rezervacije
-            </h2>
           </div>
 
           <div className="overflow-x-auto">
@@ -427,11 +685,14 @@ export default function AdminDashboard() {
                     Period
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
-                    Broj gostiju
+                      Smještaj
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
                     Status
                   </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
+                      Datum i vrijeme
+                    </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
                     Akcije
                   </th>
@@ -451,22 +712,19 @@ export default function AdminDashboard() {
                       <div className="text-sm text-[#5C4033]">
                         {new Date(reservation.check_in).toLocaleDateString()} - {new Date(reservation.check_out).toLocaleDateString()}
                       </div>
+                        <div className="text-sm text-[#5C4033]/80">
+                          {reservation.guests} {reservation.guests === 1 ? 'gost' : 'gostiju'}
+                        </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5C4033]">
-                      {reservation.guests}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-[#5C4033]">
+                          {getRoomTypeLabel(reservation.roomType)}
+                        </div>
+                        <div className="text-sm text-[#5C4033]/80">
+                          {reservation.roomType && (reservation.roomType.includes('lux') || reservation.roomType.includes('central')) ? '45 EUR/noć' : '33 EUR/noć'}
+                        </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                        ${reservation.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                          reservation.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'}`}>
-                        {reservation.status === 'confirmed' ? 'Potvrđeno' :
-                         reservation.status === 'cancelled' ? 'Otkazano' :
-                         'Na čekanju'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
                         <select
                           value={reservation.status}
                           onChange={(e) => handleStatusChange(reservation, e.target.value)}
@@ -480,6 +738,17 @@ export default function AdminDashboard() {
                           <option value="confirmed">Potvrđeno</option>
                           <option value="cancelled">Otkazano</option>
                         </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5C4033]">
+                        {new Date(reservation.created_at).toLocaleString('hr-HR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => {
                             setSelectedReservation(reservation);
@@ -489,12 +758,6 @@ export default function AdminDashboard() {
                         >
                           Detalji
                         </button>
-                      </div>
-                      {reservation.status_note && (
-                        <div className="mt-1 text-xs text-gray-500">
-                          {reservation.status_note}
-                        </div>
-                      )}
                     </td>
                   </tr>
                 ))}
@@ -502,6 +765,7 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+        )}
       </div>
 
       {/* Status Change Modal */}
