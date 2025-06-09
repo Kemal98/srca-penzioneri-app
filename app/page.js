@@ -29,6 +29,7 @@ export default function Home() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showReservationForm, setShowReservationForm] = useState(false);
+  const [showAboutUs, setShowAboutUs] = useState(false);
   const [reservationData, setReservationData] = useState({
     name: '',
     email: '',
@@ -352,8 +353,11 @@ export default function Home() {
               >
                 Rezerviši sada
               </button>
-              <button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300">
-                Pogledaj video iskustva
+              <button 
+                onClick={() => setShowAboutUs(true)}
+                className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300"
+              >
+                Saznaj više o nama
               </button>
             </div>
           </div>
@@ -566,19 +570,19 @@ export default function Home() {
 
       {/* Testimonials Section */}
       <div className="text-center mb-12">
-        <h2 className={`text-2xl md:text-3xl ${playfair.className} text-gray-900 mb-2`}>
-          Ne vjerujete nam? <span className="bg-[#009641] text-white px-2">Vjerujte njima!</span>
+        <h2 className={`text-2xl md:text-4xl ${playfair.className} text-gray-900 mb-4`}>
+          Ne vjerujete nam? <span className="bg-[#009641] text-white px-4 py-1 rounded-full">Vjerujte njima!</span>
         </h2>
-        <p className="text-base text-gray-600">Iskustva penzionera</p>
+        <p className="text-lg text-gray-600 mb-8">Iskustva penzionera</p>
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="overflow-x-auto pb-2 hide-scrollbar" id="imageContainer">
-            <div className="flex space-x-4 min-w-max">
+          <div className="overflow-x-auto pb-4 hide-scrollbar" id="imageContainer">
+            <div className="flex space-x-6 min-w-max">
               {Array.from({ length: 21 }, (_, i) => i + 1).map((num) => (
                 <div 
                   key={num}
                   className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
-                    num === 11 ? 'w-[400px]' : 'w-[300px]'
+                    num === 11 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -590,21 +594,23 @@ export default function Home() {
                     modalImg.alt = `Komentar #${num}`;
                   }}
                 >
-                  <div className="relative w-full" style={{ paddingBottom: '100%' }}>
+                  <div className="relative w-full" style={{ paddingBottom: '75%' }}>
                     <Image 
                       src={`/slike/komentari/${num}.jpg`}
                       alt={`Komentar #${num}`}
                       fill 
-                      className="object-contain transition-transform duration-300 group-hover:scale-110"
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 400px, 500px"
                     />
                   </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Custom Scrollbar */}
-          <div className="relative h-2 bg-gray-200 rounded-full mt-2 mx-4">
+          <div className="relative h-3 bg-gray-200 rounded-full mt-4 mx-4">
             <div 
               className="absolute h-full bg-[#009641] rounded-full cursor-grab active:cursor-grabbing"
               id="scrollThumb"
@@ -617,45 +623,45 @@ export default function Home() {
           
           {/* Navigation Arrows */}
           <button 
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-all"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
               const container = document.querySelector('.overflow-x-auto');
-              container.scrollLeft -= 300;
+              container.scrollLeft -= 400;
             }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <button 
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-all"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
               const container = document.querySelector('.overflow-x-auto');
-              container.scrollLeft += 300;
+              container.scrollLeft += 400;
             }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
-
+ 
         {/* Comment Modal */}
-        <div id="commentModal" className="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onClick={(e) => {
+        <div id="commentModal" className="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4" onClick={(e) => {
           if (e.target.id === 'commentModal') {
             document.getElementById('commentModal').classList.add('hidden');
           }
         }}>
-          <div className="relative max-w-4xl w-full">
+          <div className="relative max-w-5xl w-full">
             <button 
-              className="absolute -top-12 right-0 text-white hover:text-[#009641] transition-colors"
+              className="absolute -top-16 right-0 text-white hover:text-[#009641] transition-colors"
               onClick={() => document.getElementById('commentModal').classList.add('hidden')}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="relative h-[80vh] rounded-xl overflow-hidden">
+            <div className="relative h-[85vh] rounded-xl overflow-hidden">
               <Image 
                 id="commentImage"
                 src="/slike/komentari/1.jpg" 
@@ -1132,6 +1138,181 @@ export default function Home() {
         </div>
       )}
 
+      {/* About Us Modal */}
+      {showAboutUs && (
+        <div className="fixed inset-0 bg-black/95 z-50 overflow-y-auto">
+          <div className="min-h-screen w-full flex items-start justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-6xl mx-auto my-8 relative animate-slide-up">
+              <button 
+                onClick={() => setShowAboutUs(false)}
+                className="fixed top-4 right-4 md:top-8 md:right-8 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-110 z-50"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
+              <div className="p-6 md:p-8 lg:p-12">
+                <h2 className={`text-2xl md:text-3xl lg:text-4xl ${playfair.className} font-bold text-gray-900 mb-6 md:mb-8 text-center`}>
+                  Sportsko-rekreativni centar Ajdinovići
+                </h2>
+
+                <div className="max-w-4xl mx-auto mb-8 md:mb-12">
+                  <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
+                    <p className="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-4 md:mb-6">
+                      Naš centar se nalazi u srcu Bosne i Hercegovine, na 950 metara nadmorske visine, na prekrasnom prostoru od 400.000 m². Ovo je mjesto gdje priroda i udobnost stvaraju savršenu kombinaciju za vaš odmor.
+                    </p>
+                    <p className="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-4 md:mb-6">
+                      Već preko 10 godina pružamo nezaboravna iskustva našim gostima, posebno penzionerima koji su našu posebnu pažnju. Naš tim stručnjaka brine o svakom detalju vašeg boravka.
+                    </p>
+                    <div className="text-center mt-6 md:mt-8">
+                      <a 
+                        href="https://www.srca.ba" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-[#009641] hover:text-[#009641]/80 transition-colors"
+                      >
+                        <span className="text-lg md:text-xl font-semibold">Posjetite našu oficijalnu stranicu</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                    <div className="bg-[#009641]/10 p-6 md:p-8 rounded-xl">
+                      <h3 className={`text-xl md:text-2xl lg:text-3xl ${playfair.className} font-bold text-gray-900 mb-4 md:mb-6`}>
+                        Zašto baš Ajdinovići?
+                      </h3>
+                      <ul className="space-y-4 md:space-y-6">
+                        <li className="flex items-start">
+                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Prekrasna priroda i čist zrak na 950m nadmorske visine</span>
+                        </li>
+                        <li className="flex items-start">
+                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Moderan wellness centar sa bazenima i spa tretmanima</span>
+                        </li>
+                        <li className="flex items-start">
+                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Vrhunska hrana i piće u all-inclusive sistemu</span>
+                        </li>
+                        <li className="flex items-start">
+                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Raznovrsni programi za zabavu i druženje</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        "/slike/centar1.jpg",
+                        "/slike/centar2.jpg",
+                        "/slike/centar3.jpg",
+                        "/slike/centar4.jpg"
+                      ].map((image, index) => (
+                        <div 
+                          key={index}
+                          className="relative aspect-square rounded-xl overflow-hidden cursor-pointer group"
+                          onClick={() => {
+                            const modal = document.getElementById('galleryModal');
+                            const modalImg = document.getElementById('galleryImage');
+                            modal.classList.remove('hidden');
+                            modalImg.src = image;
+                          }}
+                        >
+                          <Image 
+                            src={image}
+                            alt={`Centar Ajdinovići ${index + 1}`}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-110"
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
+                  {[
+                    {
+                      title: "Smještaj",
+                      description: "Udobne sobe, bungalovi i vile sa svim modernim sadržajima",
+                      image: "/slike/smjestaj.jpg"
+                    },
+                    {
+                      title: "Wellness",
+                      description: "Bazeni, sauna, parno kupatilo i spa tretmani",
+                      image: "/slike/wellness.jpg"
+                    },
+                    {
+                      title: "Zabava",
+                      description: "Muzika uživo, folklor, bingo i tematske večeri",
+                      image: "/slike/zabava.jpg"
+                    }
+                  ].map((item, index) => (
+                    <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105">
+                      <div className="relative h-48 md:h-56 lg:h-64">
+                        <Image 
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      </div>
+                      <div className="p-4 md:p-6">
+                        <h3 className={`text-xl md:text-2xl ${playfair.className} font-bold text-gray-900 mb-2 md:mb-3`}>
+                          {item.title}
+                        </h3>
+                        <p className="text-base md:text-lg text-gray-600">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gallery Modal */}
+      <div id="galleryModal" className="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4" onClick={() => document.getElementById('galleryModal').classList.add('hidden')}>
+        <div className="relative max-w-5xl w-full">
+          <button 
+            className="absolute -top-16 right-0 text-white hover:text-[#009641] transition-colors"
+            onClick={() => document.getElementById('galleryModal').classList.add('hidden')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="relative h-[85vh] rounded-xl overflow-hidden">
+            <Image 
+              id="galleryImage"
+              src="/slike/centar1.jpg"
+              alt="Galerija centra"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Activities Calendar Section */}
       <section className="py-10 bg-[#FFFDF5]">
         <div className="container mx-auto px-4">
@@ -1199,7 +1380,7 @@ export default function Home() {
       <footer className="bg-white py-8 border-t border-gray-100">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center mb-6 animate-fade-in">
-          <Image
+            <Image
               src="/slike/logo.png"
               alt="Ajdinovići Logo"
               width={200}
@@ -1207,9 +1388,22 @@ export default function Home() {
               className="h-10 w-auto hover:scale-105 transition-transform duration-300"
             />
           </div>
-          <p className="text-center text-gray-600 text-sm animate-fade-in delay-100">
-            © 2024 Ajdinovići. Sva prava zadržana.
-          </p>
+          <div className="text-center space-y-4">
+            <a 
+              href="https://www.srca.ba" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-[#009641] hover:text-[#009641]/80 transition-colors"
+            >
+              <span className="text-lg font-semibold">Posjetite našu oficijalnu stranicu</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+            <p className="text-gray-600 text-sm animate-fade-in delay-100">
+              © 2024 Ajdinovići. Sva prava zadržana.
+            </p>
+          </div>
         </div>
       </footer>
 
