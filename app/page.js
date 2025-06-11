@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Inter, Playfair_Display, Montserrat, Poppins } from 'next/font/google';
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
+import AccessibilityPanel from './components/AccessibilityPanel';
 
 const inter = Inter({ subsets: ['latin'] });
 const playfair = Playfair_Display({ subsets: ['latin'] });
@@ -164,10 +165,10 @@ export default function Home() {
         console.error('Greška Supabase:', insertError);
         if (insertError.code === '42P01') {
           throw new Error('Tabela ne postoji. Molimo kontaktirajte administratora.');
-        }
+      }
         throw new Error('Došlo je do greške prilikom slanja podataka. Molimo pokušajte ponovo.');
       }
-
+      
       setFormStatus({ loading: false, success: true, error: null });
       
       // Reset form data
@@ -183,7 +184,7 @@ export default function Home() {
         guests: '1',
         specialRequests: ''
       });
-
+      
       // Zatvori modal ako je otvoren
       if (showReservationForm) {
         setShowReservationForm(false);
@@ -843,17 +844,17 @@ export default function Home() {
                 </button>
               </div>
 
-              <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
+            <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
+                <input
+                  type="text"
                     placeholder="Ime i prezime"
-                    name="name"
-                    value={reservationData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                  />
+                  name="name"
+                  value={reservationData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                />
                   <input
                     type="tel"
                     placeholder="Broj telefona"
@@ -866,20 +867,20 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="email"
+                <input
+                  type="email"
                     placeholder="Email (opciono)"
-                    name="email"
-                    value={reservationData.email}
-                    onChange={handleInputChange}
-                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                  />
+                  name="email"
+                  value={reservationData.email}
+                  onChange={handleInputChange}
+                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                />
                   <select
                     name="country"
                     value={reservationData.country}
-                    onChange={handleInputChange}
-                    required
-                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                  onChange={handleInputChange}
+                  required
+                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                   >
                     <option value="">Izaberite državu</option>
                     <option value="BiH">Bosna i Hercegovina</option>
@@ -889,45 +890,45 @@ export default function Home() {
                     <option value="SI">Slovenija</option>
                     <option value="other">Ostalo</option>
                   </select>
-                </div>
+              </div>
 
                 {formStatus.action === 'reservation' && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="date"
+                  <input
+                    type="date"
                         name="check_in"
                         value={reservationData.check_in}
-                        onChange={handleInputChange}
-                        required
+                    onChange={handleInputChange}
+                    required
                         className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                      />
-                      <input
-                        type="date"
+                  />
+                  <input
+                    type="date"
                         name="check_out"
                         value={reservationData.check_out}
-                        onChange={handleInputChange}
-                        required
+                    onChange={handleInputChange}
+                    required
                         className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                      />
-                    </div>
+                  />
+                </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input
                         type="number"
-                        name="guests"
-                        value={reservationData.guests}
-                        onChange={handleInputChange}
-                        required
+                  name="guests"
+                  value={reservationData.guests}
+                  onChange={handleInputChange}
+                  required
                         min="1"
                         placeholder="Broj gostiju"
                         className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                       />
-                      <select
-                        name="roomType"
-                        value={reservationData.roomType}
-                        onChange={handleInputChange}
-                        required
+                <select
+                  name="roomType"
+                  value={reservationData.roomType}
+                  onChange={handleInputChange}
+                  required
                         className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                       >
                         <option value="">Odaberite tip smještaja</option>
@@ -941,34 +942,34 @@ export default function Home() {
                           <option value="hotel-horizont">Hotel Horizont</option>
                           <option value="hotel-depadans">Hotel Depadans</option>
                         </optgroup>
-                      </select>
-                    </div>
+                </select>
+              </div>
 
-                    <textarea
+                <textarea
                       name="special_requests"
                       value={reservationData.special_requests}
-                      onChange={handleInputChange}
-                      rows="3"
+                  onChange={handleInputChange}
+                  rows="3"
                       placeholder="Posebni zahtjevi"
                       className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                    ></textarea>
+                ></textarea>
                   </>
-                )}
+              )}
 
                 <div className="flex justify-center">
-                  <button
-                    type="submit"
+              <button
+                type="submit"
                     className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
                   >
                     {formStatus.action === 'info' ? 'Pošalji zahtjev' : 'Rezerviši'}
-                  </button>
+              </button>
                 </div>
-              </form>
+            </form>
 
               {formStatus.error && (
                 <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg mt-4">
                   {formStatus.error}
-                </div>
+            </div>
               )}
 
               {formStatus.success && (
@@ -1140,10 +1141,10 @@ export default function Home() {
                             <label className="flex items-center space-x-3">
                               <input
                                 type="radio"
-                                name="roomType"
+                        name="roomType"
                                 value="lux-apartment"
                                 checked={reservationData.roomType === 'lux-apartment'}
-                                onChange={handleInputChange}
+                        onChange={handleInputChange}
                                 className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
                               />
                               <span className="text-gray-700">LUX Apartmani</span>
@@ -1500,7 +1501,7 @@ export default function Home() {
       <footer className="bg-white py-8 border-t border-gray-100">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center mb-6 animate-fade-in">
-            <Image
+          <Image
               src="/slike/logo.png"
               alt="Ajdinovići Logo"
               width={200}
@@ -1521,8 +1522,8 @@ export default function Home() {
               </svg>
             </a>
             <p className="text-gray-600 text-sm animate-fade-in delay-100">
-              © 2024 Ajdinovići. Sva prava zadržana.
-            </p>
+            © 2024 Ajdinovići. Sva prava zadržana.
+          </p>
           </div>
         </div>
       </footer>
@@ -1589,6 +1590,7 @@ export default function Home() {
           });
         `
       }} />
+      <AccessibilityPanel />
     </div>
   );
 }

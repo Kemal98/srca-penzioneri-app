@@ -36,11 +36,16 @@ export default function AdminDashboard() {
   });
   const [statusChangeModal, setStatusChangeModal] = useState({
     show: false,
-    reservation: null,
-    newStatus: '',
-    note: ''
+    contact: null,
+    newStatus: ''
   });
   const [activeTab, setActiveTab] = useState('reservations');
+  const [contactStatuses, setContactStatuses] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [fontSize, setFontSize] = useState(16); // Default font size
+  const [highContrast, setHighContrast] = useState(false); // High contrast mode
+  const [showAccessibility, setShowAccessibility] = useState(false); // Show/hide accessibility panel
   const router = useRouter();
 
   useEffect(() => {
@@ -51,10 +56,80 @@ export default function AdminDashboard() {
       }
     };
 
-    const fetchData = async () => {
+    const checkTableStructure = async () => {
       try {
-        console.log('Počinjem učitavanje podataka...'); // Debug log
+        console.log('Provjeravam strukturu tabele contacts...');
         
+        // Prvo provjeri da li tabela postoji
+        const { data: tableInfo, error: tableError } = await supabase
+          .from('contacts')
+          .select('*')
+          .limit(1);
+
+        if (tableError) {
+          console.error('Greška pri provjeri tabele:', tableError);
+          throw new Error('Greška pri provjeri tabele: ' + tableError.message);
+        }
+
+        console.log('Tabela contacts postoji:', tableInfo);
+
+        // Provjeri strukturu prvog reda
+        if (tableInfo && tableInfo.length > 0) {
+          const firstRow = tableInfo[0];
+          console.log('Struktura prvog reda:', Object.keys(firstRow));
+          
+          // Provjeri da li postoje potrebne kolone
+          const requiredColumns = ['id', 'status', 'created_at', 'updated_at'];
+          const missingColumns = requiredColumns.filter(col => !(col in firstRow));
+          
+          if (missingColumns.length > 0) {
+            console.error('Nedostaju kolone:', missingColumns);
+            throw new Error('Nedostaju kolone: ' + missingColumns.join(', '));
+          }
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Greška pri provjeri strukture:', error);
+        setError(error.message);
+        return false;
+      }
+    };
+
+    const initializeData = async () => {
+      try {
+        // Prvo provjeri strukturu tabele
+        const structureOk = await checkTableStructure();
+        if (!structureOk) {
+          throw new Error('Problem sa strukturom tabele');
+        }
+
+        // Zatim učitaj podatke
+        console.log('Počinjem učitavanje podataka...');
+        
+        // Fetch contacts
+        const { data: contactsData, error: contactsError } = await supabase
+          .from('contacts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (contactsError) {
+          console.error('Greška pri učitavanju kontakata:', contactsError);
+          throw contactsError;
+        }
+
+        console.log('Kontakti učitani:', contactsData?.length || 0);
+
+        // Postavi početne statuse za kontakte
+        const initialStatuses = {};
+        contactsData?.forEach(contact => {
+          initialStatuses[contact.id] = contact.status || 'pending';
+        });
+        
+        console.log('Inicijalni statusi:', initialStatuses);
+        setContactStatuses(initialStatuses);
+        setContacts(contactsData || []);
+
         // Fetch reservations
         const { data: reservationsData, error: reservationsError } = await supabase
           .from('reservations')
@@ -66,27 +141,11 @@ export default function AdminDashboard() {
           throw reservationsError;
         }
 
-        console.log('Rezervacije uspješno učitane:', reservationsData?.length || 0);
-
-        // Fetch contacts
-        console.log('Učitavam zahtjeve za poziv...'); // Debug log
-        const { data: contactsData, error: contactsError } = await supabase
-          .from('contacts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (contactsError) {
-          console.error('Greška pri učitavanju zahtjeva za poziv:', contactsError);
-          throw contactsError;
-        }
-
-        console.log('Zahtjevi za poziv uspješno učitani:', contactsData?.length || 0);
-        
         setReservations(reservationsData || []);
-        setContacts(contactsData || []);
         calculateStats(reservationsData || [], contactsData || []);
+        setIsInitialized(true);
       } catch (error) {
-        console.error('Greška pri učitavanju podataka:', error);
+        console.error('Greška pri inicijalizaciji:', error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -119,11 +178,31 @@ export default function AdminDashboard() {
       setStats(stats);
     };
 
+    const fetchContacts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('contacts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Greška pri dohvaćanju kontakata:', error);
+          throw error;
+        }
+
+        setContacts(data || []);
+      } catch (error) {
+        console.error('Greška:', error);
+        setError('Greška pri dohvaćanju podataka');
+      }
+    };
+
     checkAuth();
-    fetchData();
+    initializeData();
+    fetchContacts();
 
     // Osvježavaj podatke svakih 30 sekundi
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(initializeData, 30000);
 
     return () => clearInterval(interval);
   }, [router]);
@@ -133,66 +212,91 @@ export default function AdminDashboard() {
     router.push('/admin/login');
   };
 
-  const updateReservationStatus = async (id, newStatus) => {
+  const handleReservationStatusChange = async (reservation, newStatus) => {
     try {
-      const { error } = await supabase
+      console.log('Ažuriranje statusa rezervacije:', { id: reservation.id, newStatus });
+
+      const { error: updateError } = await supabase
         .from('reservations')
-        .update({ status: newStatus })
-        .eq('id', id);
+        .update({
+          status: newStatus
+        })
+        .eq('id', reservation.id);
 
-      if (error) throw error;
+      if (updateError) {
+        console.error('Greška pri ažuriranju rezervacije:', updateError);
+        throw new Error('Greška pri ažuriranju statusa rezervacije');
+      }
 
-      setReservations(prev => 
-        prev.map(reservation => 
-          reservation.id === id 
-            ? { ...reservation, status: newStatus }
-            : reservation
-        )
-      );
+      // Osvježi podatke
+      const { data: updatedReservations, error: fetchError } = await supabase
+        .from('reservations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (fetchError) {
+        throw new Error('Greška pri osvježavanju podataka');
+      }
+
+      setReservations(updatedReservations || []);
+      console.log('Status rezervacije uspješno ažuriran');
     } catch (error) {
+      console.error('Greška:', error);
       setError(error.message);
     }
   };
 
-  const handleStatusChange = (reservation, newStatus) => {
-    setStatusChangeModal({
-      show: true,
-      reservation,
-      newStatus,
-      note: ''
-    });
+  const updateContactStatus = async (contactId, newStatus) => {
+    try {
+      // Prvo ažuriraj status
+      const { error: updateError } = await supabase
+        .from('contacts')
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString(),
+          last_action: newStatus,
+          last_action_at: new Date().toISOString()
+        })
+        .eq('id', contactId);
+
+      if (updateError) throw updateError;
+
+      // Zatim dohvati sve kontakte
+      const { data: updatedContacts, error: fetchError } = await supabase
+        .from('contacts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (fetchError) throw fetchError;
+
+      // Ažuriraj stanje
+      setContacts(updatedContacts || []);
+      return true;
+    } catch (error) {
+      console.error('Greška pri ažuriranju statusa:', error);
+      setError('Greška pri ažuriranju statusa');
+      return false;
+    }
   };
 
   const confirmStatusChange = async () => {
     try {
-      const { error } = await supabase
-        .from('reservations')
-        .update({ 
-          status: statusChangeModal.newStatus
-        })
-        .eq('id', statusChangeModal.reservation.id);
-
-      if (error) {
-        console.error('Error updating status:', error);
-        throw error;
+      const { contact, newStatus } = statusChangeModal;
+      
+      if (!contact || !newStatus) {
+        setError('Nedostaju podaci za ažuriranje');
+        return;
       }
 
-      // Ažuriraj lokalno stanje
-      setReservations(prev => 
-        prev.map(res => 
-          res.id === statusChangeModal.reservation.id 
-            ? { 
-                ...res, 
-                status: statusChangeModal.newStatus
-              }
-            : res
-        )
-      );
-
-      setStatusChangeModal({ show: false, reservation: null, newStatus: '', note: '' });
+      const success = await updateContactStatus(contact.id, newStatus);
+      
+      if (success) {
+        setStatusChangeModal({ show: false, contact: null, newStatus: '' });
+        setError(null);
+      }
     } catch (error) {
-      console.error('Error in confirmStatusChange:', error);
-      setError('Greška pri promjeni statusa: ' + error.message);
+      console.error('Greška:', error);
+      setError(error.message);
     }
   };
 
@@ -285,96 +389,59 @@ export default function AdminDashboard() {
     return roomTypes[type] || type;
   };
 
-  const updateContactStatus = async (id, newStatus) => {
+  const handleReservationSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     try {
-      console.log('Pokušavam ažurirati status:', { id, newStatus });
+      const formData = new FormData(e.target);
+      const contactData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        country: formData.get('country'),
+        message: formData.get('message'),
+        action: 'contact_request',
+        status: 'pending'
+      };
 
-      // Prvo provjeri da li kontakt postoji
-      const { data: existingContact, error: fetchError } = await supabase
+      const { data, error } = await supabase
         .from('contacts')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (fetchError) {
-        console.error('Greška pri provjeri kontakta:', fetchError);
-        throw new Error('Kontakt nije pronađen');
-      }
-
-      console.log('Postojeći kontakt:', existingContact);
-
-      // Ažuriraj status kontakta
-      const { data, error: updateError } = await supabase
-        .from('contacts')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id)
+        .insert([contactData])
         .select();
 
-      if (updateError) {
-        console.error('Greška pri ažuriranju statusa:', updateError);
-        throw new Error('Greška pri ažuriranju statusa: ' + updateError.message);
+      if (error) {
+        console.error('Greška Supabase:', error);
+        throw new Error('Došlo je do greške prilikom slanja podataka. Molimo pokušajte ponovo.');
       }
 
-      console.log('Ažurirani kontakt:', data);
+      // Reset form
+      e.target.reset();
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 5000);
 
-      // Ažuriraj lokalno stanje
-      setContacts(prev => {
-        const updatedContacts = prev.map(contact => 
-          contact.id === id 
-            ? { 
-                ...contact, 
-                status: newStatus,
-                updated_at: new Date().toISOString()
-              }
-            : contact
-        );
-        console.log('Ažurirani kontakti:', updatedContacts);
-        return updatedContacts;
-      });
-
-      // Osvježi podatke nakon uspješnog ažuriranja
-      const { data: refreshedData, error: refreshError } = await supabase
-        .from('contacts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (!refreshError && refreshedData) {
-        setContacts(refreshedData);
-        console.log('Podaci osvježeni:', refreshedData);
-      }
-
-      console.log('Status uspješno ažuriran');
     } catch (error) {
-      console.error('Greška:', error);
-      setError(error.message || 'Greška pri ažuriranju statusa');
+      console.error('Greška u slanju forme:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Ažuriraj handleContactStatusChange funkciju
-  const handleContactStatusChange = async (contact, newStatus) => {
-    if (window.confirm(`Da li želite promijeniti status za ${contact.name} u "${newStatus}"?`)) {
-      try {
-        await updateContactStatus(contact.id, newStatus);
-        // Osvježi cijelu listu nakon promjene
-        const { data: refreshedData, error: refreshError } = await supabase
-          .from('contacts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (!refreshError && refreshedData) {
-          setContacts(refreshedData);
-        }
-      } catch (error) {
-        console.error('Greška pri promjeni statusa:', error);
-        setError(error.message);
-      }
-    }
+  // Funkcija za povećanje/smanjenje slova
+  const adjustFontSize = (size) => {
+    setFontSize(size);
+    document.documentElement.style.fontSize = `${size}px`;
   };
 
-  if (loading) {
+  // Funkcija za promjenu kontrasta
+  const toggleContrast = () => {
+    setHighContrast(!highContrast);
+    document.body.classList.toggle('high-contrast');
+  };
+
+  if (!isInitialized) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="flex items-center justify-center">
@@ -385,14 +452,14 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className={`min-h-screen bg-gray-50 p-8 ${highContrast ? 'high-contrast' : ''}`}>
       <div className="max-w-7xl mx-auto">
         {/* Header with Logo and Title */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/" className="w-16 h-16 relative block">
               <Image
-                src="/images/slike/logo.png"
+                src="https://i.imgur.com/BJX7nNA.jpeg"
                 alt="Ajdinovica Logo"
                 fill
                 className="object-contain"
@@ -411,6 +478,17 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            {/* Accessibility Button */}
+            <button
+              onClick={() => setShowAccessibility(!showAccessibility)}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-[#ffd700] hover:bg-[#ffd700]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffd700]"
+            >
+              <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              Pristupačnost
+            </button>
             <button
               onClick={handleLogout}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-[#ffd700] hover:bg-[#ffd700]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffd700]"
@@ -422,6 +500,58 @@ export default function AdminDashboard() {
             </button>
           </div>
         </div>
+
+        {/* Accessibility Panel */}
+        {showAccessibility && (
+          <div className="fixed top-20 right-4 bg-white rounded-lg shadow-xl p-4 z-50 border border-gray-200">
+            <h3 className="text-lg font-semibold mb-4">Pristupačnost</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Veličina slova
+                </label>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => adjustFontSize(14)}
+                    className={`px-3 py-1 rounded ${fontSize === 14 ? 'bg-[#ffd700]' : 'bg-gray-100'}`}
+                  >
+                    A-
+                  </button>
+                  <button
+                    onClick={() => adjustFontSize(16)}
+                    className={`px-3 py-1 rounded ${fontSize === 16 ? 'bg-[#ffd700]' : 'bg-gray-100'}`}
+                  >
+                    A
+                  </button>
+                  <button
+                    onClick={() => adjustFontSize(18)}
+                    className={`px-3 py-1 rounded ${fontSize === 18 ? 'bg-[#ffd700]' : 'bg-gray-100'}`}
+                  >
+                    A+
+                  </button>
+                  <button
+                    onClick={() => adjustFontSize(20)}
+                    className={`px-3 py-1 rounded ${fontSize === 20 ? 'bg-[#ffd700]' : 'bg-gray-100'}`}
+                  >
+                    A++
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Kontrast
+                </label>
+                <button
+                  onClick={toggleContrast}
+                  className={`px-4 py-2 rounded ${highContrast ? 'bg-[#ffd700]' : 'bg-gray-100'}`}
+                >
+                  {highContrast ? 'Isključi visoki kontrast' : 'Uključi visoki kontrast'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Action buttons */}
         <div className="flex justify-between items-center mb-4">
           <div className="text-sm text-gray-500">
@@ -522,28 +652,6 @@ export default function AdminDashboard() {
               <h2 className={`text-xl ${playfair.className} font-bold text-[#5C4033]`}>
                 Zahtjevi za poziv
               </h2>
-              <div className="flex space-x-4">
-                <select
-                  value={filters.contactStatus}
-                  onChange={(e) => setFilters({ ...filters, contactStatus: e.target.value })}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
-                >
-                  <option value="all">Svi statusi</option>
-                  <option value="pending">Na čekanju</option>
-                  <option value="contacted">Kontaktirano</option>
-                  <option value="called">Pozvano</option>
-                </select>
-                <select
-                  value={filters.contactDateRange}
-                  onChange={(e) => setFilters({ ...filters, contactDateRange: e.target.value })}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
-                >
-                  <option value="all">Svi datumi</option>
-                  <option value="today">Danas</option>
-                  <option value="week">Ovaj tjedan</option>
-                  <option value="month">Ovaj mjesec</option>
-                </select>
-              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -560,7 +668,7 @@ export default function AdminDashboard() {
                       Država
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
-                Status
+                      Poruka
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
                       Datum i vrijeme
@@ -571,69 +679,83 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {contacts
-                    .filter(contact => {
-                      if (filters.contactStatus !== 'all' && contact.status !== filters.contactStatus) {
-                        return false;
-                      }
-                      const contactDate = new Date(contact.created_at);
-                      const now = new Date();
-                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                      const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-
-                      if (filters.contactDateRange === 'today' && contactDate < today) return false;
-                      if (filters.contactDateRange === 'week' && contactDate < weekAgo) return false;
-                      if (filters.contactDateRange === 'month' && contactDate < monthAgo) return false;
-
-                      return true;
-                    })
-                    .map((contact) => (
-                    <tr key={contact.id}>
+                  {contacts.map((contact) => (
+                    <tr key={contact.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-[#5C4033]">{contact.name}</div>
+                        <div className="text-sm font-medium text-gray-900">{contact.name}</div>
+                        <div className="text-sm text-gray-500">{contact.phone}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-[#5C4033]">{contact.email}</div>
-                        <div className="text-sm text-[#5C4033]/80">{contact.phone}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5C4033]">
-                        {contact.country}
+                        <div className="text-sm text-gray-900">{contact.email || '-'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={contact.status || 'pending'}
-                          onChange={(e) => handleContactStatusChange(contact, e.target.value)}
-                          className={`text-sm rounded-md border-gray-300 focus:ring-[#ffd700] focus:border-[#ffd700] ${
-                            contact.status === 'contacted' ? 'bg-blue-50 text-blue-700' :
-                            contact.status === 'called' ? 'bg-green-50 text-green-700' :
-                            'bg-yellow-50 text-yellow-700'
-                          }`}
-                        >
-                          <option value="pending">Na čekanju</option>
-                          <option value="contacted">Kontaktirano</option>
-                          <option value="called">Pozvano</option>
-                        </select>
+                        <div className="text-sm text-gray-900">{contact.country || '-'}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5C4033]">
-                        {new Date(contact.created_at).toLocaleString('hr-HR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900 max-w-xs truncate">
+                          {contact.message || '-'}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => {
-                            setSelectedReservation(contact);
-                            setShowModal(true);
-                          }}
-                          className="text-[#ffd700] hover:text-[#ffd700]/80"
-                        >
-                          Detalji
-                        </button>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {new Date(contact.created_at).toLocaleString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => setStatusChangeModal({
+                              show: true,
+                              contact,
+                              newStatus: 'kontaktiran'
+                            })}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
+                              contact.status === 'kontaktiran' 
+                                ? 'bg-green-500 text-white border border-green-600' 
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300'
+                            }`}
+                          >
+                            Kontaktiran
+                          </button>
+                          <button
+                            onClick={() => setStatusChangeModal({
+                              show: true,
+                              contact,
+                              newStatus: 'nije_odgovorio'
+                            })}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
+                              contact.status === 'nije_odgovorio' 
+                                ? 'bg-red-500 text-white border border-red-600' 
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300'
+                            }`}
+                          >
+                            Nije odgovorio
+                          </button>
+                          <button
+                            onClick={() => setStatusChangeModal({
+                              show: true,
+                              contact,
+                              newStatus: 'rezervisano'
+                            })}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
+                              contact.status === 'rezervisano' 
+                                ? 'bg-blue-500 text-white border border-blue-600' 
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300'
+                            }`}
+                          >
+                            Rezervisano
+                          </button>
+                        </div>
+                        {contact.last_action && contact.last_action_at && (
+                          <div className="mt-1 text-xs text-gray-500">
+                            Zadnja akcija: {contact.last_action} - {new Date(contact.last_action_at).toLocaleString('hr-HR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -692,7 +814,7 @@ export default function AdminDashboard() {
                   </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
                       Datum i vrijeme
-                    </th>
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#5C4033] uppercase tracking-wider">
                     Akcije
                   </th>
@@ -714,7 +836,7 @@ export default function AdminDashboard() {
                       </div>
                         <div className="text-sm text-[#5C4033]/80">
                           {reservation.guests} {reservation.guests === 1 ? 'gost' : 'gostiju'}
-                        </div>
+                      </div>
                     </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-[#5C4033]">
@@ -727,7 +849,7 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap">
                         <select
                           value={reservation.status}
-                          onChange={(e) => handleStatusChange(reservation, e.target.value)}
+                          onChange={(e) => handleReservationStatusChange(reservation, e.target.value)}
                           className={`text-sm rounded-md border-gray-300 focus:ring-[#ffd700] focus:border-[#ffd700] ${
                             reservation.status === 'confirmed' ? 'bg-green-50 text-green-700' :
                             reservation.status === 'cancelled' ? 'bg-red-50 text-red-700' :
@@ -769,61 +891,55 @@ export default function AdminDashboard() {
       </div>
 
       {/* Status Change Modal */}
-      {statusChangeModal.show && statusChangeModal.reservation && (
+      {statusChangeModal.show && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md mx-4 relative animate-slide-up">
-            <button 
-              onClick={() => setStatusChangeModal({ show: false, reservation: null, newStatus: '', note: '' })}
-              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:shadow-xl transition-all hover:scale-110"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
             <div className="p-6">
-              <h2 className={`text-xl ${playfair.className} font-bold text-gray-900 mb-4`}>
-                Promjena statusa rezervacije
-              </h2>
+              <h3 className={`text-xl ${playfair.className} font-bold text-gray-900 mb-4`}>
+                Promjena statusa
+              </h3>
               
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Gost
+                    Kontakt
                   </label>
-                  <p className="text-gray-900">{statusChangeModal.reservation.name}</p>
+                  <div className="text-sm text-gray-900">
+                    {statusChangeModal.contact?.name}
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Novi status
                   </label>
-                  <select
-                    value={statusChangeModal.newStatus}
-                    onChange={(e) => setStatusChangeModal(prev => ({ ...prev, newStatus: e.target.value }))}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#ffd700] focus:ring-[#ffd700]"
-                  >
-                    <option value="pending">Na čekanju</option>
-                    <option value="confirmed">Potvrđeno</option>
-                    <option value="cancelled">Otkazano</option>
-                  </select>
+                  <div className="text-sm text-gray-900">
+                    {statusChangeModal.newStatus}
+                  </div>
+                  <div className="mt-1 text-xs text-gray-500">
+                    Vrijeme akcije će biti postavljeno na trenutno vrijeme
+                  </div>
                 </div>
 
                 {error && (
-                  <div className="text-red-600 text-sm">
+                  <div className="text-red-600 text-sm bg-red-50 p-2 rounded">
                     {error}
                   </div>
                 )}
+              </div>
 
                 <div className="flex justify-end space-x-3 mt-6">
                   <button
-                    onClick={() => setStatusChangeModal({ show: false, reservation: null, newStatus: '', note: '' })}
+                  onClick={() => {
+                    setStatusChangeModal({ show: false, contact: null, newStatus: '' });
+                    setError(null);
+                  }}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
                   >
                     Odustani
                   </button>
                   <button
-                    onClick={confirmStatusChange}
+                  onClick={confirmStatusChange}
                     className="px-4 py-2 text-sm font-medium text-black bg-[#ffd700] hover:bg-[#ffd700]/90 rounded-md"
                   >
                     Potvrdi promjenu
@@ -832,8 +948,50 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+      )}
+
+      {/* Error Notification */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+          <strong className="font-bold">Greška: </strong>
+          <span className="block sm:inline">{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="absolute top-0 right-0 px-4 py-3"
+          >
+            <span className="sr-only">Zatvori</span>
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
   );
-} 
+}
+
+// Dodajte ove stilove u vaš CSS
+const styles = `
+.high-contrast {
+  --text-color: #000000;
+  --bg-color: #ffffff;
+  --link-color: #0000ff;
+  --button-bg: #ffff00;
+  --button-text: #000000;
+}
+
+.high-contrast body {
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+.high-contrast a {
+  color: var(--link-color);
+}
+
+.high-contrast button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 2px solid var(--button-text);
+}
+`; 
