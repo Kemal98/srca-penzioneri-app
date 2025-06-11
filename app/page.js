@@ -5,6 +5,7 @@ import { Inter, Playfair_Display, Montserrat, Poppins } from 'next/font/google';
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import AccessibilityPanel from './components/AccessibilityPanel';
+import { sendSMS, formatReservationMessage } from './lib/infobip';
 
 const inter = Inter({ subsets: ['latin'] });
 const playfair = Playfair_Display({ subsets: ['latin'] });
@@ -127,6 +128,12 @@ export default function Home() {
         throw new Error('Molimo popunite sva obavezna polja');
       }
 
+      // Validacija broja telefona
+      const phoneRegex = /^(\+387|0)?[0-9]{8,9}$/;
+      if (!phoneRegex.test(reservationData.phone)) {
+        throw new Error('Molimo unesite ispravan broj telefona (npr. 0603422909 ili +387603422909)');
+      }
+
       // Ako je rezervacija, provjeri dodatna polja
       if (reservationData.action === 'reservation') {
         if (!reservationData.checkIn || !reservationData.checkOut || !reservationData.roomType) {
@@ -165,8 +172,16 @@ export default function Home() {
         console.error('Greška Supabase:', insertError);
         if (insertError.code === '42P01') {
           throw new Error('Tabela ne postoji. Molimo kontaktirajte administratora.');
-      }
+        }
         throw new Error('Došlo je do greške prilikom slanja podataka. Molimo pokušajte ponovo.');
+      }
+      
+      // Pošalji SMS potvrdu
+      const message = formatReservationMessage(data);
+      const smsResult = await sendSMS(reservationData.phone, message);
+
+      if (!smsResult.success) {
+        console.error('SMS sending failed:', smsResult.error);
       }
       
       setFormStatus({ loading: false, success: true, error: null });
