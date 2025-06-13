@@ -791,124 +791,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Positive Reviews Carousel */}
-          <div className="mt-12">
-            <h3 className={`text-2xl ${playfair.className} font-bold text-gray-900 mb-6 text-center`}>
-              Pozitivne recenzije naših gostiju
-            </h3>
-            
-            {/* First Row */}
-            <div className="relative mb-8">
-              <div className="overflow-x-auto pb-4 hide-scrollbar">
-                <div className="flex space-x-6 min-w-max">
-                  {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                    <div 
-                      key={num}
-                      className="relative w-[300px] md:w-[400px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const modal = document.getElementById('commentModal');
-                        const modalImg = document.getElementById('commentImage');
-                        modal.classList.remove('hidden');
-                        const imagePath = `/slike/komentari/${num}.jpg`;
-                        modalImg.src = imagePath;
-                        modalImg.alt = `Komentar #${num}`;
-                      }}
-                    >
-                      <div className="relative w-full" style={{ paddingBottom: '75%' }}>
-                        <Image 
-                          src={`/slike/komentari/${num}.jpg`}
-                          alt={`Komentar #${num}`}
-                          fill 
-                          className="object-contain transition-transform duration-300 group-hover:scale-105"
-                          sizes="(max-width: 768px) 300px, 400px"
-                        />
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <button 
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
-                onClick={() => {
-                  const container = document.querySelector('.overflow-x-auto');
-                  container.scrollLeft -= 400;
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button 
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
-                onClick={() => {
-                  const container = document.querySelector('.overflow-x-auto');
-                  container.scrollLeft += 400;
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
 
-            {/* Second Row */}
-            <div className="relative">
-              <div className="overflow-x-auto pb-4 hide-scrollbar mt-2" id="imageContainer2">
-                <div className="flex space-x-6 min-w-max">
-                  {Array.from({ length: 10 }, (_, i) => i + 11).map((num) => (
-                    <div 
-                      key={num}
-                      className="relative w-[300px] md:w-[400px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const modal = document.getElementById('commentModal');
-                        const modalImg = document.getElementById('commentImage');
-                        modal.classList.remove('hidden');
-                        const imagePath = `/slike/komentari/${num}.jpg`;
-                        modalImg.src = imagePath;
-                        modalImg.alt = `Komentar #${num}`;
-                      }}
-                    >
-                      <div className="relative w-full" style={{ paddingBottom: '75%' }}>
-                        <Image 
-                          src={`/slike/komentari/${num}.jpg`}
-                          alt={`Komentar #${num}`}
-                          fill 
-                          className="object-contain transition-transform duration-300 group-hover:scale-105"
-                          sizes="(max-width: 768px) 300px, 400px"
-                        />
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <button 
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
-                onClick={() => {
-                  const container = document.querySelectorAll('.overflow-x-auto')[1];
-                  container.scrollLeft -= 400;
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button 
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
-                onClick={() => {
-                  const container = document.querySelectorAll('.overflow-x-auto')[1];
-                  container.scrollLeft += 400;
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
 
           <div className="mt-8 pt-8 border-t border-gray-100">
             <div className="bg-[#009641]/10 p-6 rounded-xl">
@@ -934,48 +817,13 @@ export default function Home() {
         <p className="text-lg text-gray-600 mb-8">Iskustva penzionera</p>
 
         <div className="relative max-w-7xl mx-auto px-4">
-          {/* First Row */}
           <div className="overflow-x-auto pb-4 hide-scrollbar" id="imageContainer">
             <div className="flex space-x-6 min-w-max">
-              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 21 }, (_, i) => i + 1).map((num) => (
                 <div 
                   key={num}
                   className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
-                    num === 5 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const modal = document.getElementById('commentModal');
-                    const modalImg = document.getElementById('commentImage');
-                    modal.classList.remove('hidden');
-                    const imagePath = `/slike/komentari/${num}.jpg`;
-                    modalImg.src = imagePath;
-                    modalImg.alt = `Komentar #${num}`;
-                  }}
-                >
-                  <div className="relative w-full" style={{ paddingBottom: '75%' }}>
-                    <Image 
-                      src={`/slike/komentari/${num}.jpg`}
-                      alt={`Komentar #${num}`}
-                      fill 
-                      className="object-contain transition-transform duration-300 group-hover:scale-105"
-                      sizes="(max-width: 768px) 400px, 500px"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Second Row */}
-          <div className="overflow-x-auto pb-4 hide-scrollbar mt-2" id="imageContainer2">
-            <div className="flex space-x-6 min-w-max">
-              {Array.from({ length: 10 }, (_, i) => i + 11).map((num) => (
-                <div 
-                  key={num}
-                  className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
-                    num === 15 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
+                    num === 11 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1018,10 +866,8 @@ export default function Home() {
           <button 
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
-              const containers = document.querySelectorAll('.overflow-x-auto');
-              containers.forEach(container => {
-                container.scrollLeft -= 400;
-              });
+              const container = document.querySelector('.overflow-x-auto');
+              container.scrollLeft -= 400;
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1031,10 +877,8 @@ export default function Home() {
           <button 
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
-              const containers = document.querySelectorAll('.overflow-x-auto');
-              containers.forEach(container => {
-                container.scrollLeft += 400;
-              });
+              const container = document.querySelector('.overflow-x-auto');
+              container.scrollLeft += 400;
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1072,140 +916,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Testimonial Modal */}
-      <div id="testimonialModal" className="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onClick={(e) => {
-        if (e.target.id === 'testimonialModal') {
-          document.getElementById('testimonialModal').classList.add('hidden');
-        }
-      }}>
-        <div className="relative max-w-4xl w-full">
-          <button 
-            className="absolute -top-12 right-0 text-white hover:text-[#009641] transition-colors"
-            onClick={() => document.getElementById('testimonialModal').classList.add('hidden')}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div className="relative h-[70vh] rounded-xl overflow-hidden">
-            <Image 
-              id="testimonialImage"
-              src="/slike/grupa1.jpg" 
-              alt="Testimonial image" 
-              fill 
-              className="object-contain"
-            />
-          </div>
+      <div className="mt-8 pt-8 border-t border-gray-100">
+        <div className="bg-[#009641]/10 p-6 rounded-xl">
+          <h4 className={`text-xl ${playfair.className} font-bold text-gray-900 mb-4`}>
+            100% Garancija zadovoljstva:
+          </h4>
+          <p className="text-lg text-gray-700 mb-2">
+            Ako prvog dana ne budete zadovoljni — vratimo vam novac!
+          </p>
+          <p className="text-sm text-gray-600 italic">
+            (Niko do sada nije tražio povrat — ali volimo da znate da imate opciju.)
+          </p>
         </div>
       </div>
-
-      {/* FAQ Section */}
-      <section className="py-10 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className={`text-2xl md:text-3xl ${playfair.className} text-gray-900 mb-2`}>
-              Česta <span className="bg-[#009641] text-white px-2">pitanja</span>
-            </h2>
-            <p className="text-base text-gray-600">Sve što trebate znati</p>
-          </div>
-
-          <div className="max-w-3xl mx-auto space-y-4">
-            {[
-              {
-                question: "Kako mogu doći do Ajdinovića?",
-                answer: [
-                  "Sportsko-rekreativni centar Ajdinovići se nalazi u srcu Bosne i Hercegovine, na idealnoj lokaciji — 50 minuta vožnje od Sarajeva, na magistralnom putu Sarajevo–Tuzla, otprilike na pola puta između ova dva grada.",
-                  "Do našeg centra dolazite vlastitim prevozom.",
-                  "Ne vršimo organizovani prijevoz, ali mnoge penzionerske organizacije i udruženja u BiH, Hrvatskoj, Srbiji i Sloveniji redovno organizuju dolaske u Ajdinoviće."
-                ]
-              },
-              {
-                question: "Da li je ponuda zaista All-Inclusive? Šta sve uključuje?",
-                answer: [
-                  "Da, ponuda je potpuno All-Inclusive — jednom kad stignete u centar, sve što Vam je potrebno je već uključeno u cijenu.",
-                  "Ponuda uključuje:",
-                  "✅ Smještaj (sobe, bungalovi, vile ili hotelske sobe — prema dogovoru)",
-                  "✅ Neograničena hrana (3 obroka dnevno + užine)",
-                  "✅ Neograničeno piće (alkoholna i bezalkoholna pića)",
-                  "✅ Korištenje svih bazena (unutrašnjih i vanjskih)",
-                  "✅ Korištenje spa centra (sauna, parno kupatilo, relaks zona)",
-                  "✅ ZOO vrt i šetnje kroz prirodu",
-                  "✅ Sportski tereni (tenis, nogomet, košarka, odbojka...)",
-                  "✅ Večernji program:",
-                  "   • Muzika uživo",
-                  "   • Folklor",
-                  "   • Bingo večeri",
-                  "   • Tematske zabave",
-                  "✅ Animacije i druženja tokom dana",
-                  "Sve navedeno je uključeno u cijenu — nema dodatnih troškova!"
-                ]
-              },
-              {
-                question: "Da li je centar prilagođen starijim osobama?",
-                answer: [
-                  "Da, centar je potpuno prilagođen i za starije osobe:",
-                  "✅ Imamo prilazne staze bez stepenica gdje je potrebno",
-                  "✅ Liftove u glavnom objektiu",
-                  "✅ Dovoljno prostora i mjesta za odmor tokom šetnji",
-                  "✅ Fizioterapeuti su dostupni za konsultacije i tretmane u centru (posebno popularno kod penzionera)",
-                  "✅ Posebno vodimo računa da programi nisu naporni i da svaki gost može uživati svojim tempom."
-                ]
-              },
-              {
-                question: "Kako da rezervišem i šta mi je potrebno za dolazak?",
-                answer: [
-                  "➡️ Vrlo jednostavno — samo ostavite Vaše ime i broj telefona putem ove stranice.",
-                  "➡️ Naš tim će Vas pozvati i pomoći Vam da rezervišete najbolji mogući termin.",
-                  "➡️ Ako dolazite preko udruženja, možemo Vam pomoći da ih kontaktirate.",
-                  "➡️ Za individualne dolaske — slobodno rezervišite direktno kod nas."
-                ]
-              }
-            ].map((faq, index) => (
-              <div key={index} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-100">
-                <button
-                  onClick={() => {
-                    const answer = document.getElementById(`answer-${index}`);
-                    const icon = document.getElementById(`icon-${index}`);
-                    if (answer.style.maxHeight) {
-                      answer.style.maxHeight = null;
-                      icon.style.transform = 'rotate(0deg)';
-                    } else {
-                      answer.style.maxHeight = answer.scrollHeight + "px";
-                      icon.style.transform = 'rotate(180deg)';
-                    }
-                  }}
-                  className="w-full text-left p-6 focus:outline-none flex justify-between items-center"
-                >
-                  <h3 className={`text-xl ${playfair.className} font-bold text-gray-900`}>
-                    {faq.question}
-                  </h3>
-                  <svg
-                    id={`icon-${index}`}
-                    className="w-6 h-6 text-[#009641] transition-transform duration-300"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div
-                  id={`answer-${index}`}
-                  className="overflow-hidden transition-all duration-300 ease-in-out max-h-0"
-                >
-                  <div className="p-6 pt-0 space-y-3">
-                    {faq.answer.map((line, lineIndex) => (
-                      <p key={lineIndex} className="text-gray-600">
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-10 bg-gradient-to-br from-blue-50 to-purple-50">
