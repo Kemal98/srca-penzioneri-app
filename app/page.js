@@ -50,6 +50,60 @@ export default function Home() {
     error: null
   });
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [currentFoodImageIndex, setCurrentFoodImageIndex] = useState(0);
+  const [currentAccommodationImageIndex, setCurrentAccommodationImageIndex] = useState(0);
+  const [currentWellnessImageIndex, setCurrentWellnessImageIndex] = useState(0);
+  const [currentEntertainmentImageIndex, setCurrentEntertainmentImageIndex] = useState(0);
+  const [currentTripsImageIndex, setCurrentTripsImageIndex] = useState(0);
+  const [currentZooImageIndex, setCurrentZooImageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  const foodImages = [
+    "https://i.imgur.com/asCNLpJ.jpeg",
+    "https://i.imgur.com/GajaKjB.jpeg",
+    "https://i.imgur.com/UzLFwzr.jpeg",
+    "https://i.imgur.com/vYn8vJC.jpeg",
+    "https://i.imgur.com/4i6xdHa.jpeg"
+  ];
+
+  const accommodationImages = [
+    "https://i.imgur.com/O66fr1v.jpeg",
+    "https://i.imgur.com/rrXhCKK.jpeg",
+    "https://i.imgur.com/UzLFwzr.jpeg",
+    "https://i.imgur.com/vYn8vJC.jpeg",
+    "https://i.imgur.com/4i6xdHa.jpeg"
+  ];
+
+  const wellnessImages = [
+    "https://i.imgur.com/gMPHBtB.jpeg",
+    "https://i.imgur.com/swvH196.jpeg",
+    "https://i.imgur.com/Ma1tygm.jpeg",
+    "https://i.imgur.com/4i6xdHa.jpeg"
+  ];
+
+  const entertainmentImages = [
+    "https://i.imgur.com/asCNLpJ.jpeg",
+    "https://i.imgur.com/GajaKjB.jpeg",
+    "https://i.imgur.com/UzLFwzr.jpeg",
+    "https://i.imgur.com/vYn8vJC.jpeg",
+    "https://i.imgur.com/4i6xdHa.jpeg"
+  ];
+
+  const tripsImages = [
+    "https://i.imgur.com/asCNLpJ.jpeg",
+    "https://i.imgur.com/GajaKjB.jpeg",
+    "https://i.imgur.com/UzLFwzr.jpeg",
+    "https://i.imgur.com/vYn8vJC.jpeg",
+    "https://i.imgur.com/4i6xdHa.jpeg"
+  ];
+
+  const zooImages = [
+    "https://i.imgur.com/asCNLpJ.jpeg",
+    "https://i.imgur.com/GajaKjB.jpeg",
+    "https://i.imgur.com/UzLFwzr.jpeg",
+    "https://i.imgur.com/vYn8vJC.jpeg",
+    "https://i.imgur.com/4i6xdHa.jpeg"
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,6 +164,67 @@ export default function Home() {
     };
 
     getLocation();
+  }, []);
+
+  useEffect(() => {
+    const intervals = [
+      setInterval(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentFoodImageIndex((prevIndex) => 
+            prevIndex === foodImages.length - 1 ? 0 : prevIndex + 1
+          );
+          setIsTransitioning(false);
+        }, 1000);
+      }, 5000),
+      setInterval(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentAccommodationImageIndex((prevIndex) => 
+            prevIndex === accommodationImages.length - 1 ? 0 : prevIndex + 1
+          );
+          setIsTransitioning(false);
+        }, 1000);
+      }, 5000),
+      setInterval(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentWellnessImageIndex((prevIndex) => 
+            prevIndex === wellnessImages.length - 1 ? 0 : prevIndex + 1
+          );
+          setIsTransitioning(false);
+        }, 1000);
+      }, 5000),
+      setInterval(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentEntertainmentImageIndex((prevIndex) => 
+            prevIndex === entertainmentImages.length - 1 ? 0 : prevIndex + 1
+          );
+          setIsTransitioning(false);
+        }, 1000);
+      }, 5000),
+      setInterval(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentTripsImageIndex((prevIndex) => 
+            prevIndex === tripsImages.length - 1 ? 0 : prevIndex + 1
+          );
+          setIsTransitioning(false);
+        }, 1000);
+      }, 5000),
+      setInterval(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setCurrentZooImageIndex((prevIndex) => 
+            prevIndex === zooImages.length - 1 ? 0 : prevIndex + 1
+          );
+          setIsTransitioning(false);
+        }, 1000);
+      }, 5000)
+    ];
+
+    return () => intervals.forEach(interval => clearInterval(interval));
   }, []);
 
   const scrollToTop = () => {
@@ -442,34 +557,46 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {[
               { 
-                image: "/slike/1.jpg", 
                 title: "Smještaj",
-                description: "Hoteli, bungalovi, planinske kuće, vile"
+                description: "Hoteli, bungalovi, planinske kuće, vile",
+                isSlideshow: true,
+                images: accommodationImages,
+                currentIndex: currentAccommodationImageIndex
               },
               { 
-                image: "/slike/2.jpg", 
                 title: "Wellness",
-                description: "SPA & Wellness centar"
+                description: "SPA & Wellness centar",
+                isSlideshow: true,
+                images: wellnessImages,
+                currentIndex: currentWellnessImageIndex
               },
               { 
-                image: "/slike/3.jpg", 
                 title: "Hrana",
-                description: "Neograničena hrana i piće"
+                description: "Neograničena hrana i piće",
+                isSlideshow: true,
+                images: foodImages,
+                currentIndex: currentFoodImageIndex
               },
               { 
-                image: "/slike/4.jpg", 
                 title: "Zabava",
-                description: "Posebni programi za penzionere"
+                description: "Posebni programi za penzionere",
+                isSlideshow: true,
+                images: entertainmentImages,
+                currentIndex: currentEntertainmentImageIndex
               },
               { 
-                image: "/slike/5.jpg", 
                 title: "Izleti",
-                description: "Organizovani izleti u prirodu"
+                description: "Organizovani izleti u prirodu",
+                isSlideshow: true,
+                images: tripsImages,
+                currentIndex: currentTripsImageIndex
               },
               { 
-                image: "/slike/6.jpg", 
                 title: "ZOO vrt",
-                description: "Posjeta ZOO vrtu"
+                description: "Posjeta ZOO vrtu",
+                isSlideshow: true,
+                images: zooImages,
+                currentIndex: currentZooImageIndex
               }
             ].map((item, index) => (
               <div key={index} className="space-y-2">
@@ -480,16 +607,45 @@ export default function Home() {
                     const modalImg = document.getElementById('modalImage');
                     const modalTitle = document.getElementById('modalTitle');
                     modal.classList.remove('hidden');
-                    modalImg.src = item.image;
+                    modalImg.src = item.images[item.currentIndex];
                     modalTitle.textContent = item.title;
                   }}
                 >
-                  <Image 
-                    src={item.image} 
-                    alt={item.title} 
-                    fill 
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
+                  {item.isSlideshow ? (
+                    <div className="relative w-full h-full">
+                      {item.images.map((img, idx) => (
+                        <img 
+                          key={idx}
+                          src={img} 
+                          alt={item.title} 
+                          className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                            idx === item.currentIndex 
+                              ? 'opacity-100 scale-100' 
+                              : 'opacity-0 scale-110'
+                          } ${isTransitioning ? 'transform-gpu' : ''}`}
+                        />
+                      ))}
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                        {item.images.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className={`w-2 h-2 rounded-full transition-all duration-1000 ${
+                              idx === item.currentIndex 
+                                ? 'bg-white scale-125' 
+                                : 'bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <Image 
+                      src={item.image} 
+                      alt={item.title} 
+                      fill 
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   <div className="absolute bottom-3 left-3 text-white">
                     <h3 className={`text-lg ${playfair.className} font-bold`}>{item.title}</h3>
@@ -563,7 +719,7 @@ export default function Home() {
                   <svg className="h-6 w-6 text-[#009641] mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <p className="text-gray-700">Više od <span className="font-bold">300 pozitivnih recenzija</span> na Facebooku i Googlu</p>
+                  <p className="text-gray-700">Više od <span className="font-bold">2.000 pozitivnih recenzija</span> na Google-u</p>
                 </li>
                 <li className="flex items-start">
                   <svg className="h-6 w-6 text-[#009641] mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -582,6 +738,24 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <p className="text-gray-700">Sigurno, toplo i prijateljsko okruženje</p>
+                </li>
+                <li className="flex items-start">
+                  <svg className="h-6 w-6 text-[#009641] mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <p className="text-gray-700">Ugošćili smo goste iz <span className="font-bold">Srbije, Hrvatske, Crne Gore, Slovenije i Makedonije</span></p>
+                </li>
+                <li className="flex items-start">
+                  <svg className="h-6 w-6 text-[#009641] mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <p className="text-gray-700">Sarađujemo sa <span className="font-bold">brojnim penzionerskim udruženjima</span> iz cijele regije</p>
+                </li>
+                <li className="flex items-start">
+                  <svg className="h-6 w-6 text-[#009641] mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <p className="text-gray-700">Organizujemo <span className="font-bold">posebne programe i izlete</span> za penzionere</p>
                 </li>
               </ul>
             </div>
@@ -605,7 +779,7 @@ export default function Home() {
                     modalImg.src = item.image;
                   }}
                 >
-                  <Image 
+                  <Image
                     src={item.image} 
                     alt="Komentar" 
                     fill 
@@ -614,6 +788,125 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Positive Reviews Carousel */}
+          <div className="mt-12">
+            <h3 className={`text-2xl ${playfair.className} font-bold text-gray-900 mb-6 text-center`}>
+              Pozitivne recenzije naših gostiju
+            </h3>
+            
+            {/* First Row */}
+            <div className="relative mb-8">
+              <div className="overflow-x-auto pb-4 hide-scrollbar">
+                <div className="flex space-x-6 min-w-max">
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                    <div 
+                      key={num}
+                      className="relative w-[300px] md:w-[400px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const modal = document.getElementById('commentModal');
+                        const modalImg = document.getElementById('commentImage');
+                        modal.classList.remove('hidden');
+                        const imagePath = `/slike/komentari/${num}.jpg`;
+                        modalImg.src = imagePath;
+                        modalImg.alt = `Komentar #${num}`;
+                      }}
+                    >
+                      <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+                        <Image 
+                          src={`/slike/komentari/${num}.jpg`}
+                          alt={`Komentar #${num}`}
+                          fill 
+                          className="object-contain transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 300px, 400px"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button 
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
+                onClick={() => {
+                  const container = document.querySelector('.overflow-x-auto');
+                  container.scrollLeft -= 400;
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button 
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
+                onClick={() => {
+                  const container = document.querySelector('.overflow-x-auto');
+                  container.scrollLeft += 400;
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Second Row */}
+            <div className="relative">
+              <div className="overflow-x-auto pb-4 hide-scrollbar mt-2" id="imageContainer2">
+                <div className="flex space-x-6 min-w-max">
+                  {Array.from({ length: 10 }, (_, i) => i + 11).map((num) => (
+                    <div 
+                      key={num}
+                      className="relative w-[300px] md:w-[400px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const modal = document.getElementById('commentModal');
+                        const modalImg = document.getElementById('commentImage');
+                        modal.classList.remove('hidden');
+                        const imagePath = `/slike/komentari/${num}.jpg`;
+                        modalImg.src = imagePath;
+                        modalImg.alt = `Komentar #${num}`;
+                      }}
+                    >
+                      <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+                        <Image 
+                          src={`/slike/komentari/${num}.jpg`}
+                          alt={`Komentar #${num}`}
+                          fill 
+                          className="object-contain transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 300px, 400px"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button 
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
+                onClick={() => {
+                  const container = document.querySelectorAll('.overflow-x-auto')[1];
+                  container.scrollLeft -= 400;
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button 
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
+                onClick={() => {
+                  const container = document.querySelectorAll('.overflow-x-auto')[1];
+                  container.scrollLeft += 400;
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -641,13 +934,48 @@ export default function Home() {
         <p className="text-lg text-gray-600 mb-8">Iskustva penzionera</p>
 
         <div className="relative max-w-7xl mx-auto px-4">
+          {/* First Row */}
           <div className="overflow-x-auto pb-4 hide-scrollbar" id="imageContainer">
             <div className="flex space-x-6 min-w-max">
-              {Array.from({ length: 21 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                 <div 
                   key={num}
                   className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
-                    num === 11 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
+                    num === 5 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const modal = document.getElementById('commentModal');
+                    const modalImg = document.getElementById('commentImage');
+                    modal.classList.remove('hidden');
+                    const imagePath = `/slike/komentari/${num}.jpg`;
+                    modalImg.src = imagePath;
+                    modalImg.alt = `Komentar #${num}`;
+                  }}
+                >
+                  <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+                    <Image 
+                      src={`/slike/komentari/${num}.jpg`}
+                      alt={`Komentar #${num}`}
+                      fill 
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 400px, 500px"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Second Row */}
+          <div className="overflow-x-auto pb-4 hide-scrollbar mt-2" id="imageContainer2">
+            <div className="flex space-x-6 min-w-max">
+              {Array.from({ length: 10 }, (_, i) => i + 11).map((num) => (
+                <div 
+                  key={num}
+                  className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
+                    num === 15 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -690,8 +1018,10 @@ export default function Home() {
           <button 
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
-              const container = document.querySelector('.overflow-x-auto');
-              container.scrollLeft -= 400;
+              const containers = document.querySelectorAll('.overflow-x-auto');
+              containers.forEach(container => {
+                container.scrollLeft -= 400;
+              });
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -701,8 +1031,10 @@ export default function Home() {
           <button 
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
-              const container = document.querySelector('.overflow-x-auto');
-              container.scrollLeft += 400;
+              const containers = document.querySelectorAll('.overflow-x-auto');
+              containers.forEach(container => {
+                container.scrollLeft += 400;
+              });
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1358,524 +1690,101 @@ export default function Home() {
 
       {/* About Us Modal */}
       {showAboutUs && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-[90%] xl:max-w-[1400px] overflow-hidden">
-            <div className="relative">
-              <button
-                onClick={() => setShowAboutUs(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="p-4 md:p-6 lg:p-8 xl:p-12">
-                <h2 className={`text-3xl font-bold text-gray-900 mb-6 ${playfair.className}`}>
-                    Saznaj više o nama
-                </h2>
-
-                <div className="space-y-8 mb-8">
-                  {/* Introduction Text */}
-                  <div>
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                      Sportsko-rekreativni centar Ajdinovići
-                    </h3>
-                    <p className="text-gray-600 text-lg mb-4">
-                      Smješten u srcu Bosne i Hercegovine, na nadmorskoj visini od 950 metara, Sportsko-rekreativni centar Ajdinovići idealno je mjesto za odmor, opuštanje i druženje u prirodi. Nalazimo se tačno na pola puta između Sarajeva i Tuzle, svega 50 kilometara udaljeni od oba grada, što naš centar čini lako dostupnim gostima iz cijele regije.
-                    </p>
-                    <p className="text-gray-600 text-lg">
-                      Već 10 godina pružamo vrhunski all-inclusive doživljaj na površini od preko 400.000 kvadratnih metara netaknute prirode. Naš kompleks zatvorenog tipa nudi savršen spoj prirodnog okruženja i bogatog sadržaja — od uređenih šetnih staza, zoološkog vrta, kafića, restorana sa tradicionalnom bosanskom kuhinjom (pite, domaći kolači, specijaliteti), do modernog wellness & spa centra, unutrašnjih i vanjskih bazena i sportskih terena.
-                    </p>
-                  </div>
-
-                  {/* Hotel Images - 4 per row */}
-                  <div>
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                      Naši hoteli
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-8">
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/rajKkoz.jpeg"
-                          alt="Hotel Central"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Hotel Central</h3>
-                        </div>
-                      </div>
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/eX87jl5.jpeg"
-                          alt="Hotel Horizont"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Hotel Horizont</h3>
-                        </div>
-                      </div>
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/rajKkoz.jpeg"
-                          alt="Hotel Central"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Hotel Central</h3>
-                        </div>
-                      </div>
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/eX87jl5.jpeg"
-                          alt="Hotel Horizont"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Hotel Horizont</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Food Images - 4 per row */}
-                  <div>
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                      Naša hrana
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-8">
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/UzLFwzr.jpeg"
-                          alt="Tradicionalna hrana"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Tradicionalna hrana</h3>
-                        </div>
-                      </div>
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/asCNLpJ.jpeg"
-                          alt="Specijaliteti"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Specijaliteti</h3>
-                        </div>
-                      </div>
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/UzLFwzr.jpeg"
-                          alt="Tradicionalna hrana"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Tradicionalna hrana</h3>
-                        </div>
-                      </div>
-                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src="https://i.imgur.com/asCNLpJ.jpeg"
-                          alt="Specijaliteti"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                          <h3 className="text-white text-lg font-semibold">Specijaliteti</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Scrollable Sections */}
-                  <div>
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                      Smještajne jedinice
-                    </h3>
-                    <div className="relative overflow-hidden">
-                      <div className="flex space-x-4 overflow-x-auto pb-4 snap-x snap-mandatory">
-                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
-                          <img
-                            src="https://i.imgur.com/EgrAKW8.jpeg"
-                            alt="Bungalovi"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h3 className="text-white text-lg font-semibold">Bungalovi</h3>
-                          </div>
-                        </div>
-                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
-                          <img
-                            src="https://i.imgur.com/Hs2nXWm.png"
-                            alt="Planinske kuće"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h3 className="text-white text-lg font-semibold">Planinske kuće</h3>
-                          </div>
-                        </div>
-                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
-                          <img
-                            src="https://i.imgur.com/EgrAKW8.jpeg"
-                            alt="Bungalovi"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h3 className="text-white text-lg font-semibold">Bungalovi</h3>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                      Priroda i okruženje
-                    </h3>
-                    <div className="relative overflow-hidden">
-                      <div className="flex space-x-4 overflow-x-auto pb-4 snap-x snap-mandatory">
-                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
-                          <img
-                            src="https://i.imgur.com/4i6xdHa.jpeg"
-                            alt="Priroda"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h3 className="text-white text-lg font-semibold">Priroda</h3>
-                          </div>
-                        </div>
-                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
-                          <img
-                            src="https://i.imgur.com/rajKkoz.jpeg"
-                            alt="Okruženje"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h3 className="text-white text-lg font-semibold">Okruženje</h3>
-                          </div>
-                        </div>
-                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
-                          <img
-                            src="https://i.imgur.com/4i6xdHa.jpeg"
-                            alt="Priroda"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h3 className="text-white text-lg font-semibold">Priroda</h3>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* All-inclusive Section */}
-                  <div>
-                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                      All-inclusive ponuda za penzionere
-                    </h3>
-                    <p className="text-gray-600 text-lg mb-4">
-                      Naša all-inclusive ponuda za penzionere omogućava vam bezbrižan odmor po jedinstvenoj cijeni, bez ijednog dodatnog troška. Do sada su nas posjetile stotine zadovoljnih penzionera iz Srbije, Hrvatske, Sjeverne Makedonije, Slovenije i Crne Gore, a svi su uživali u potpunoj udobnosti i gostoljubivosti našeg centra.
-                    </p>
-                    <div className="bg-gray-50 p-6 rounded-xl">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">U cijenu boravka uključeni su:</h4>
-                      <ul className="space-y-3 text-gray-600">
-                        <li className="flex items-start">
-                          <span className="text-[#ffd700] mr-2">★</span>
-                          smještaj u udobnim objektima (hoteli, vile, planinske kuće, bungalovi)
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-[#ffd700] mr-2">★</span>
-                          neograničena hrana i piće (bezalkoholno i alkoholno) tokom cijelog boravka
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-[#ffd700] mr-2">★</span>
-                          pristup slanim sobama, hladnim sobama, hladnim klupama i kompletnom wellness & spa centru
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-[#ffd700] mr-2">★</span>
-                          korištenje unutrašnjih i vanjskih bazena
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-[#ffd700] mr-2">★</span>
-                          uživanje u bogatom prirodnom ambijentu i sadržajima našeg centra
-                        </li>
-                      </ul>
-                    </div>
-                    <p className="text-gray-600 text-lg mt-4">
-                      Jednom kada platite svoj boravak, sve vam je dostupno — bez ikakvih dodatnih plaćanja na licu mjesta.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-6 max-w-4xl mx-auto">
-                  <p className="text-gray-600 text-lg">
-                    Dođite i uvjerite se zašto je Sportsko-rekreativni centar Ajdinovići omiljena destinacija penzionera koji traže mir, udobnost, sigurnost i kompletnu all-inclusive uslugu!
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-[95%] md:max-w-[90%] lg:max-w-[85%] xl:max-w-[1200px] my-8 relative">
+            <button
+              onClick={() => setShowAboutUs(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="p-4 md:p-6 lg:p-8 xl:p-12 max-h-[90vh] overflow-y-auto">
+              <div className="space-y-8 mb-8">
+                {/* Location Section */}
+                <div>
+                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                    Gdje se nalazimo
+                  </h3>
+                  <p className="text-gray-600 text-base md:text-lg mb-4">
+                    Smješten u srcu Bosne i Hercegovine, na nadmorskoj visini od 950 metara, Sportsko-rekreativni centar Ajdinovići idealno je mjesto za odmor, opuštanje i druženje u prirodi. Nalazimo se tačno na pola puta između Sarajeva i Tuzle, svega 50 kilometara udaljeni od oba grada, što naš centar čini lako dostupnim gostima iz cijele regije.
                   </p>
+                  <p className="text-gray-600 text-base md:text-lg mb-8">
+                    Već 10 godina pružamo vrhunski all-inclusive doživljaj na površini od preko 400.000 kvadratnih metara netaknute prirode. Naš kompleks zatvorenog tipa nudi savršen spoj prirodnog okruženja i bogatog sadržaja — od uređenih šetnih staza, zoološkog vrta, kafića, restorana sa tradicionalnom bosanskom kuhinjom (pite, domaći kolači, specijaliteti), do modernog wellness & spa centra, unutrašnjih i vanjskih bazena i sportskih terena.
+                  </p>
+
+                  {/* Google Maps Embed */}
+                  <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg mb-8">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d442298.6908528376!2d18.49231485338172!3d44.04845697328216!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475928294f0af933%3A0x1989668180dc04d0!2sSportsko-rekreativni%20centar%20Ajdinovi%C4%87i!5e0!3m2!1sbs!2sba!4v1749847321690!5m2!1sbs!2sba" 
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0 }} 
+                      allowFullScreen="" 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  </div>
                 </div>
 
-                <div className="flex justify-end mt-8">
-                  <button
-                    onClick={() => setShowAboutUs(false)}
-                    className="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
-                  >
-                    Zatvori
-                  </button>
+                {/* All-inclusive Section */}
+                <div>
+                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                    All-inclusive ponuda za penzionere
+                  </h3>
+                  <p className="text-gray-600 text-base md:text-lg mb-4">
+                    Naša all-inclusive ponuda za penzionere omogućava vam bezbrižan odmor po jedinstvenoj cijeni, bez ijednog dodatnog troška. Do sada su nas posjetile stotine zadovoljnih penzionera iz Srbije, Hrvatske, Sjeverne Makedonije, Slovenije i Crne Gore, a svi su uživali u potpunoj udobnosti i gostoljubivosti našeg centra.
+                  </p>
+                  <div className="bg-gray-50 p-4 md:p-6 rounded-xl mb-8">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">U cijenu boravka uključeni su:</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        smještaj u udobnim objektima (hoteli, vile, planinske kuće, bungalovi)
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        neograničena hrana i piće (bezalkoholno i alkoholno) tokom cijelog boravka
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        pristup slanim sobama, hladnim sobama, hladnim klupama i kompletnom wellness & spa centru
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        korištenje unutrašnjih i vanjskih bazena
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        uživanje u bogatom prirodnom ambijentu i sadržajima našeg centra
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Second Image */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src="https://i.imgur.com/UzLFwzr.jpeg"
+                        alt="Tradicionalna hrana"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src="https://i.imgur.com/la2it2V.jpeg"
+                        alt="Bazeni Ajdinovici"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* Gallery Modal */}
-      <div id="galleryModal" className="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4" onClick={() => document.getElementById('galleryModal').classList.add('hidden')}>
-        <div className="relative max-w-5xl w-full">
-          <button 
-            className="absolute -top-16 right-0 text-white hover:text-[#009641] transition-colors"
-            onClick={() => document.getElementById('galleryModal').classList.add('hidden')}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div className="relative h-[85vh] rounded-xl overflow-hidden">
-            <Image 
-              id="galleryImage"
-              src="/slike/centar1.jpg"
-              alt="Galerija centra"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Activities Calendar Section */}
-      <section className="py-10 bg-[#FFFDF5]">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className={`text-2xl md:text-3xl ${playfair.className} text-gray-900 mb-2`}>
-              Kalendar <span className="bg-[#009641] text-white px-2">aktivnosti</span>
-            </h2>
-            <p className="text-base text-gray-600">Svaki dan nova zabava i druženje</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                day: "Ponedjeljak",
-                activities: [
-                  "Jutarnja gimnastika",
-                  "Bingo",
-                  "Večernji tamburaši"
-                ]
-              },
-              {
-                day: "Utorak",
-                activities: [
-                  "Izlet u prirodu",
-                  "Karaoke",
-                  "Film večer"
-                ]
-              },
-              {
-                day: "Srijeda",
-                activities: [
-                  "Joga za penzionere",
-                  "Kartanje",
-                  "Folklor"
-                ]
-              },
-              {
-                day: "Četvrtak",
-                activities: [
-                  "Šetnja",
-                  "Kviz znanja",
-                  "Muzički program"
-                ]
-              }
-            ].map((day, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 duration-300">
-                <h3 className={`text-xl ${playfair.className} font-bold text-gray-900 mb-4`}>{day.day}</h3>
-                <ul className="space-y-3">
-                  {day.activities.map((activity, actIndex) => (
-                    <li key={actIndex} className="flex items-center text-gray-600">
-                      <svg className="h-5 w-5 text-[#009641] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {activity}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-white py-8 border-t border-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center mb-6 animate-fade-in">
-          <Image
-              src="/slike/logo.png"
-              alt="Ajdinovići Logo"
-              width={200}
-              height={80}
-              className="h-10 w-auto hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-          <div className="text-center space-y-4">
-            <a 
-              href="https://www.srca.ba" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-[#009641] hover:text-[#009641]/80 transition-colors"
-            >
-              <span className="text-lg font-semibold">Posjetite našu oficijalnu stranicu</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-            <p className="text-gray-600 text-sm animate-fade-in delay-100">
-            © 2024 Ajdinovići. Sva prava zadržana.
-          </p>
-          </div>
-        </div>
-      </footer>
-
-      <style jsx global>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-
-      <script dangerouslySetInnerHTML={{
-        __html: `
-          document.addEventListener('DOMContentLoaded', function() {
-            const container = document.getElementById('imageContainer');
-            const thumb = document.getElementById('scrollThumb');
-            let isDragging = false;
-            let startX;
-            let scrollLeft;
-
-            // Update thumb position based on scroll
-            function updateThumbPosition() {
-              const scrollWidth = container.scrollWidth - container.clientWidth;
-              const scrollLeft = container.scrollLeft;
-              const percentage = (scrollLeft / scrollWidth) * 100;
-              thumb.style.left = percentage + '%';
-            }
-
-            // Handle thumb drag
-            thumb.addEventListener('mousedown', (e) => {
-              isDragging = true;
-              startX = e.pageX - thumb.offsetLeft;
-              thumb.style.cursor = 'grabbing';
-            });
-
-            document.addEventListener('mousemove', (e) => {
-              if (!isDragging) return;
-              e.preventDefault();
-              
-              const containerRect = container.getBoundingClientRect();
-              const thumbRect = thumb.getBoundingClientRect();
-              const containerWidth = containerRect.width;
-              const thumbWidth = thumbRect.width;
-              
-              let newLeft = e.pageX - containerRect.left - startX;
-              newLeft = Math.max(0, Math.min(newLeft, containerWidth - thumbWidth));
-              
-              const percentage = (newLeft / (containerWidth - thumbWidth)) * 100;
-              container.scrollLeft = (percentage / 100) * (container.scrollWidth - container.clientWidth);
-            });
-
-            document.addEventListener('mouseup', () => {
-              isDragging = false;
-              thumb.style.cursor = 'grab';
-            });
-
-            // Update on scroll
-            container.addEventListener('scroll', updateThumbPosition);
-            window.addEventListener('resize', updateThumbPosition);
-            updateThumbPosition();
-          });
-        `
-      }} />
-      <AccessibilityPanel />
-
-      {/* About Us Section */}
-      <section id="about" className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-              Saznaj više o nama
-            </h2>
-            <p className="text-lg text-gray-600">
-              Naš kompleks nudi vrhunski smještaj, izvrsnu hranu i nezaboravno iskustvo u srcu prirode.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
-              <img
-                src="https://i.imgur.com/UzLFwzr.jpeg"
-                alt="Tradicionalna hrana"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                <h3 className="text-white text-xl font-semibold">Tradicionalna hrana</h3>
-              </div>
-            </div>
-            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
-              <img
-                src="https://i.imgur.com/asCNLpJ.jpeg"
-                alt="Specijaliteti"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                <h3 className="text-white text-xl font-semibold">Specijaliteti</h3>
-              </div>
-            </div>
-            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
-              <img
-                src="https://i.imgur.com/4i6xdHa.jpeg"
-                alt="Restoran"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                <h3 className="text-white text-xl font-semibold">Restoran</h3>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h3 className={`text-2xl font-bold text-gray-900 ${playfair.className}`}>
-                Naša priča
-              </h3>
-              <p className="text-gray-600">
-                Smješteni u srcu planine, naš kompleks nudi jedinstveno iskustvo za sve koji žele pobjeći od gradske vreve i uživati u prirodi. Naš tim je posvećen pružanju vrhunske usluge i stvaranju nezaboravnih trenutaka za naše goste.
-              </p>
-              <p className="text-gray-600">
-                Naš restoran nudi izvrsnu hranu pripremljenu od svježih, lokalnih namirnica. Naši kuhari kombiniraju tradicionalne recepte sa modernim tehnikama kuhanja kako bi stvorili jedinstveno gastronomsko iskustvo.
-              </p>
-            </div>
-            <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-              <img
-                src="https://i.imgur.com/rajKkoz.jpeg"
-                alt="Naš kompleks"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
-
