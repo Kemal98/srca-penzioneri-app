@@ -812,18 +812,22 @@ export default function Home() {
       {/* Testimonials Section */}
       <div className="text-center mb-12">
         <h2 className={`text-2xl md:text-4xl ${playfair.className} text-gray-900 mb-4`}>
-          Ne vjerujete nam? <span className="bg-[#009641] text-white px-4 py-1 rounded-full">Vjerujte njima!</span>
+          Ne vjerujete nam? <span className="relative">
+            <span className={`relative z-10 text-white font-bold ${playfair.className}`}>Vjerujte njima!</span>
+            <span className="absolute inset-0 bg-[#009641] -rotate-1 transform"></span>
+          </span>
         </h2>
         <p className="text-lg text-gray-600 mb-8">Iskustva penzionera</p>
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="overflow-x-auto pb-4 hide-scrollbar" id="imageContainer">
-            <div className="flex space-x-6 min-w-max">
-              {Array.from({ length: 21 }, (_, i) => i + 1).map((num) => (
+          {/* First Row */}
+          <div className="overflow-x-auto pb-1 hide-scrollbar" id="imageContainer">
+            <div className="flex space-x-3 min-w-max">
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                 <div 
                   key={num}
                   className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
-                    num === 11 ? 'w-[500px] md:w-[600px]' : 'w-[400px] md:w-[500px]'
+                    num === 5 ? 'w-[300px] md:w-[400px]' : 'w-[250px] md:w-[350px]'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -841,7 +845,41 @@ export default function Home() {
                       alt={`Komentar #${num}`}
                       fill 
                       className="object-contain transition-transform duration-300 group-hover:scale-105"
-                      sizes="(max-width: 768px) 400px, 500px"
+                      sizes="(max-width: 768px) 250px, 350px"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Second Row */}
+          <div className="overflow-x-auto pb-1 hide-scrollbar mt-1" id="imageContainer2">
+            <div className="flex space-x-3 min-w-max">
+              {Array.from({ length: 10 }, (_, i) => i + 11).map((num) => (
+                <div 
+                  key={num}
+                  className={`relative rounded-xl overflow-hidden cursor-pointer group transition-all duration-300 ${
+                    num === 15 ? 'w-[300px] md:w-[400px]' : 'w-[250px] md:w-[350px]'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const modal = document.getElementById('commentModal');
+                    const modalImg = document.getElementById('commentImage');
+                    modal.classList.remove('hidden');
+                    const imagePath = `/slike/komentari/${num}.jpg`;
+                    modalImg.src = imagePath;
+                    modalImg.alt = `Komentar #${num}`;
+                  }}
+                >
+                  <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+                    <Image 
+                      src={`/slike/komentari/${num}.jpg`}
+                      alt={`Komentar #${num}`}
+                      fill 
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 250px, 350px"
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -866,8 +904,10 @@ export default function Home() {
           <button 
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
-              const container = document.querySelector('.overflow-x-auto');
-              container.scrollLeft -= 400;
+              const containers = document.querySelectorAll('.overflow-x-auto');
+              containers.forEach(container => {
+                container.scrollLeft -= 300;
+              });
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -877,8 +917,10 @@ export default function Home() {
           <button 
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all hover:scale-110"
             onClick={() => {
-              const container = document.querySelector('.overflow-x-auto');
-              container.scrollLeft += 400;
+              const containers = document.querySelectorAll('.overflow-x-auto');
+              containers.forEach(container => {
+                container.scrollLeft += 300;
+              });
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -913,20 +955,6 @@ export default function Home() {
               />
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="mt-8 pt-8 border-t border-gray-100">
-        <div className="bg-[#009641]/10 p-6 rounded-xl">
-          <h4 className={`text-xl ${playfair.className} font-bold text-gray-900 mb-4`}>
-            100% Garancija zadovoljstva:
-          </h4>
-          <p className="text-lg text-gray-700 mb-2">
-            Ako prvog dana ne budete zadovoljni — vratimo vam novac!
-          </p>
-          <p className="text-sm text-gray-600 italic">
-            (Niko do sada nije tražio povrat — ali volimo da znate da imate opciju.)
-          </p>
         </div>
       </div>
 
@@ -1508,6 +1536,92 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            {/* Logo and Description */}
+            <div className="text-center md:text-left">
+              <Image
+                src="/slike/logo.png"
+                alt="Ajdinovići Logo"
+                width={200}
+                height={80}
+                className="h-16 w-auto mx-auto md:mx-0 mb-4"
+              />
+              <p className="text-gray-600 text-sm">
+                Sportsko-rekreativni centar Ajdinovići - Vaša oaza mira i ugodnosti na 950m nadmorske visine
+              </p>
+              <a 
+                href="https://www.srca.ba" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[#009641] hover:text-[#009641]/80 transition-colors text-sm mt-2 inline-block"
+              >
+                Posjetite naš oficijalni sajt →
+              </a>
+            </div>
+
+            {/* Quick Links */}
+            <div className="text-center">
+              <h3 className={`text-lg ${playfair.className} font-bold mb-4 text-gray-900`}>Brzi linkovi</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#about" className="text-gray-600 hover:text-[#009641] transition-colors">O nama</a>
+                </li>
+                <li>
+                  <a href="#services" className="text-gray-600 hover:text-[#009641] transition-colors">Usluge</a>
+                </li>
+                <li>
+                  <a href="#contact" className="text-gray-600 hover:text-[#009641] transition-colors">Kontakt</a>
+                </li>
+                <li>
+                  <a href="#reservation" className="text-gray-600 hover:text-[#009641] transition-colors">Rezervacija</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Social Media and Contact */}
+            <div className="text-center md:text-right">
+              <h3 className={`text-lg ${playfair.className} font-bold mb-4 text-gray-900`}>Pratite nas</h3>
+              <div className="flex justify-center md:justify-end space-x-4 mb-4">
+                <a 
+                  href="https://www.facebook.com/ajdinovici" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-[#009641] transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                  </svg>
+                </a>
+                <a 
+                  href="https://www.instagram.com/ajdinovici" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-[#009641] transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 011.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 01-1.153 1.772 4.915 4.915 0 01-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 01-1.772-1.153 4.904 4.904 0 01-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 011.153-1.772A4.897 4.897 0 015.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm6.5-.25a1.25 1.25 0 10-2.5 0 1.25 1.25 0 002.5 0zM12 9a3 3 0 110 6 3 3 0 010-6z"/>
+                  </svg>
+                </a>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Tel: +387 35 123 456<br />
+                Email: info@ajdinovici.ba
+              </p>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="border-t border-gray-200 mt-8 pt-8 text-center">
+            <p className="text-gray-600 text-sm">
+              © {new Date().getFullYear()} Sportsko-rekreativni centar Ajdinovići. Sva prava zadržana.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
