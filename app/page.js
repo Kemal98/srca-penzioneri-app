@@ -1371,107 +1371,244 @@ export default function Home() {
               </button>
               <div className="p-4 md:p-6 lg:p-8 xl:p-12">
                 <h2 className={`text-3xl font-bold text-gray-900 mb-6 ${playfair.className}`}>
-                  Saznaj više o nama
+                    Saznaj više o nama
                 </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-8">
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/rajKkoz.jpeg"
-                      alt="Hotel Central"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Hotel Central</h3>
-                    </div>
-                  </div>
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/eX87jl5.jpeg"
-                      alt="Hotel Horizont"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Hotel Horizont</h3>
-                    </div>
-                  </div>
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/la2it2V.jpeg"
-                      alt="Hotel Depadans"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Hotel Depadans</h3>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-8">
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/EgrAKW8.jpeg"
-                      alt="Bungalovi"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Bungalovi</h3>
-                    </div>
+                <div className="space-y-8 mb-8">
+                  {/* Introduction Text */}
+                  <div>
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                      Sportsko-rekreativni centar Ajdinovići
+                    </h3>
+                    <p className="text-gray-600 text-lg mb-4">
+                      Smješten u srcu Bosne i Hercegovine, na nadmorskoj visini od 950 metara, Sportsko-rekreativni centar Ajdinovići idealno je mjesto za odmor, opuštanje i druženje u prirodi. Nalazimo se tačno na pola puta između Sarajeva i Tuzle, svega 50 kilometara udaljeni od oba grada, što naš centar čini lako dostupnim gostima iz cijele regije.
+                    </p>
+                    <p className="text-gray-600 text-lg">
+                      Već 10 godina pružamo vrhunski all-inclusive doživljaj na površini od preko 400.000 kvadratnih metara netaknute prirode. Naš kompleks zatvorenog tipa nudi savršen spoj prirodnog okruženja i bogatog sadržaja — od uređenih šetnih staza, zoološkog vrta, kafića, restorana sa tradicionalnom bosanskom kuhinjom (pite, domaći kolači, specijaliteti), do modernog wellness & spa centra, unutrašnjih i vanjskih bazena i sportskih terena.
+                    </p>
                   </div>
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/Hs2nXWm.png"
-                      alt="Planinske kuće"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Planinske kuće</h3>
-                    </div>
-                  </div>
-                </div>
 
-                <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                  Naša hrana
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-8">
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/UzLFwzr.jpeg"
-                      alt="Tradicionalna hrana"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Tradicionalna hrana</h3>
+                  {/* Hotel Images - 4 per row */}
+                  <div>
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                      Naši hoteli
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-8">
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/rajKkoz.jpeg"
+                          alt="Hotel Central"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Hotel Central</h3>
+                        </div>
+                      </div>
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/eX87jl5.jpeg"
+                          alt="Hotel Horizont"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Hotel Horizont</h3>
+                        </div>
+                      </div>
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/rajKkoz.jpeg"
+                          alt="Hotel Central"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Hotel Central</h3>
+                        </div>
+                      </div>
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/eX87jl5.jpeg"
+                          alt="Hotel Horizont"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Hotel Horizont</h3>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/asCNLpJ.jpeg"
-                      alt="Specijaliteti"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Specijaliteti</h3>
+
+                  {/* Food Images - 4 per row */}
+                  <div>
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                      Naša hrana
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-8">
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/UzLFwzr.jpeg"
+                          alt="Tradicionalna hrana"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Tradicionalna hrana</h3>
+                        </div>
+                      </div>
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/asCNLpJ.jpeg"
+                          alt="Specijaliteti"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Specijaliteti</h3>
+                        </div>
+                      </div>
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/UzLFwzr.jpeg"
+                          alt="Tradicionalna hrana"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Tradicionalna hrana</h3>
+                        </div>
+                      </div>
+                      <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src="https://i.imgur.com/asCNLpJ.jpeg"
+                          alt="Specijaliteti"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                          <h3 className="text-white text-lg font-semibold">Specijaliteti</h3>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
-                    <img
-                      src="https://i.imgur.com/4i6xdHa.jpeg"
-                      alt="Restoran"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <h3 className="text-white text-lg font-semibold">Restoran</h3>
+
+                  {/* Scrollable Sections */}
+                  <div>
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                      Smještajne jedinice
+                    </h3>
+                    <div className="relative overflow-hidden">
+                      <div className="flex space-x-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
+                          <img
+                            src="https://i.imgur.com/EgrAKW8.jpeg"
+                            alt="Bungalovi"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            <h3 className="text-white text-lg font-semibold">Bungalovi</h3>
+                          </div>
+                        </div>
+                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
+                          <img
+                            src="https://i.imgur.com/Hs2nXWm.png"
+                            alt="Planinske kuće"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            <h3 className="text-white text-lg font-semibold">Planinske kuće</h3>
+                          </div>
+                        </div>
+                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
+                          <img
+                            src="https://i.imgur.com/EgrAKW8.jpeg"
+                            alt="Bungalovi"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            <h3 className="text-white text-lg font-semibold">Bungalovi</h3>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                  </div>
+
+                  <div>
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                      Priroda i okruženje
+                    </h3>
+                    <div className="relative overflow-hidden">
+                      <div className="flex space-x-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
+                          <img
+                            src="https://i.imgur.com/4i6xdHa.jpeg"
+                            alt="Priroda"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            <h3 className="text-white text-lg font-semibold">Priroda</h3>
+                          </div>
+                        </div>
+                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
+                          <img
+                            src="https://i.imgur.com/rajKkoz.jpeg"
+                            alt="Okruženje"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            <h3 className="text-white text-lg font-semibold">Okruženje</h3>
+                          </div>
+                        </div>
+                        <div className="relative h-64 w-full min-w-[300px] rounded-xl overflow-hidden shadow-lg snap-center">
+                          <img
+                            src="https://i.imgur.com/4i6xdHa.jpeg"
+                            alt="Priroda"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                            <h3 className="text-white text-lg font-semibold">Priroda</h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* All-inclusive Section */}
+                  <div>
+                    <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                      All-inclusive ponuda za penzionere
+                    </h3>
+                    <p className="text-gray-600 text-lg mb-4">
+                      Naša all-inclusive ponuda za penzionere omogućava vam bezbrižan odmor po jedinstvenoj cijeni, bez ijednog dodatnog troška. Do sada su nas posjetile stotine zadovoljnih penzionera iz Srbije, Hrvatske, Sjeverne Makedonije, Slovenije i Crne Gore, a svi su uživali u potpunoj udobnosti i gostoljubivosti našeg centra.
+                    </p>
+                    <div className="bg-gray-50 p-6 rounded-xl">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">U cijenu boravka uključeni su:</h4>
+                      <ul className="space-y-3 text-gray-600">
+                        <li className="flex items-start">
+                          <span className="text-[#ffd700] mr-2">★</span>
+                          smještaj u udobnim objektima (hoteli, vile, planinske kuće, bungalovi)
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-[#ffd700] mr-2">★</span>
+                          neograničena hrana i piće (bezalkoholno i alkoholno) tokom cijelog boravka
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-[#ffd700] mr-2">★</span>
+                          pristup slanim sobama, hladnim sobama, hladnim klupama i kompletnom wellness & spa centru
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-[#ffd700] mr-2">★</span>
+                          korištenje unutrašnjih i vanjskih bazena
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-[#ffd700] mr-2">★</span>
+                          uživanje u bogatom prirodnom ambijentu i sadržajima našeg centra
+                        </li>
+                      </ul>
+                    </div>
+                    <p className="text-gray-600 text-lg mt-4">
+                      Jednom kada platite svoj boravak, sve vam je dostupno — bez ikakvih dodatnih plaćanja na licu mjesta.
+                    </p>
                   </div>
                 </div>
 
                 <div className="space-y-6 max-w-4xl mx-auto">
                   <p className="text-gray-600 text-lg">
-                    Naš kompleks nudi vrhunski smještaj, izvrsnu hranu i nezaboravno iskustvo u srcu prirode. Otkrijte naše posebne ponude i uživajte u čaroliji planine.
-                  </p>
-                  <p className="text-gray-600 text-lg">
-                    Naš restoran nudi izvrsnu hranu pripremljenu od svježih, lokalnih namirnica. Naši kuhari kombiniraju tradicionalne recepte sa modernim tehnikama kuhanja kako bi stvorili jedinstveno gastronomsko iskustvo.
+                    Dođite i uvjerite se zašto je Sportsko-rekreativni centar Ajdinovići omiljena destinacija penzionera koji traže mir, udobnost, sigurnost i kompletnu all-inclusive uslugu!
                   </p>
                 </div>
 
