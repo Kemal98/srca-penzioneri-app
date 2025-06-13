@@ -49,6 +49,7 @@ export default function Home() {
     success: false,
     error: null
   });
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -354,13 +355,13 @@ export default function Home() {
               Birajte sami koliko noći želite — sve je All-Inclusive!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-300 mt-4">
-              <button 
+              <button
                 onClick={() => setShowReservationForm(true)}
                 className="bg-[#009641] text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-[#009641]/90 transition-all shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5 duration-300"
               >
                 Rezerviši sada
               </button>
-              <button 
+              <button
                 onClick={() => setShowAboutUs(true)}
                 className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300"
               >
@@ -370,6 +371,63 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Welcome Popup */}
+      {showWelcomePopup && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full overflow-hidden">
+            <div className="relative">
+              <button
+                onClick={() => setShowWelcomePopup(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <div className="p-8">
+                <h2 className={`text-3xl font-bold text-gray-900 mb-6 ${playfair.className}`}>
+                  Dobrodošli u našu oazu mira i ugodnosti
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div className="relative h-48 rounded-xl overflow-hidden">
+                    <img
+                      src="https://i.imgur.com/UzLFwzr.jpeg"
+                      alt="Tradicionalna hrana"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="relative h-48 rounded-xl overflow-hidden">
+                    <img
+                      src="https://i.imgur.com/asCNLpJ.jpeg"
+                      alt="Specijaliteti"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="relative h-48 rounded-xl overflow-hidden">
+                    <img
+                      src="https://i.imgur.com/4i6xdHa.jpeg"
+                      alt="Restoran"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-6">
+                  Naš kompleks nudi vrhunski smještaj, izvrsnu hranu i nezaboravno iskustvo u srcu prirode. Otkrijte naše posebne ponude i uživajte u čaroliji planine.
+                </p>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setShowWelcomePopup(false)}
+                    className="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
+                  >
+                    Zatvori
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features Section */}
       <section className="py-16 bg-white relative overflow-hidden">
@@ -754,11 +812,10 @@ export default function Home() {
                 question: "Da li je centar prilagođen starijim osobama?",
                 answer: [
                   "Da, centar je potpuno prilagođen i za starije osobe:",
-                  "✅ Imamo rampe i prilazne staze bez stepenica gdje je potrebno",
-                  "✅ Liftove u glavnim objektima",
+                  "✅ Imamo prilazne staze bez stepenica gdje je potrebno",
+                  "✅ Liftove u glavnom objektiu",
                   "✅ Dovoljno prostora i mjesta za odmor tokom šetnji",
                   "✅ Fizioterapeuti su dostupni za konsultacije i tretmane u centru (posebno popularno kod penzionera)",
-                  "✅ Medicinsko osoblje je dostupno 24/7 u slučaju potrebe",
                   "✅ Posebno vodimo računa da programi nisu naporni i da svaki gost može uživati svojim tempom."
                 ]
               },
@@ -826,7 +883,7 @@ export default function Home() {
               Zatražite poziv i saznajte sve <span className="bg-[#009641] text-white px-2">bez obaveza</span>
             </h2>
             <p className="text-base text-gray-600 mb-8">
-              Naša recepcija će vas pozvati i objasniti sve što vas zanima. Sve informacije su besplatne i bez obaveza.
+              Naša recepcija će vas pozvati i objasniti sve što vas zanima. Posebna ponuda za penzionere - 50% popusta na redovne cijene!
             </p>
 
             <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
@@ -859,132 +916,157 @@ export default function Home() {
                 </button>
               </div>
 
-            <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                    placeholder="Ime i prezime"
-                  name="name"
-                  value={reservationData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                />
-                  <input
-                    type="tel"
-                    placeholder="Broj telefona"
-                    name="phone"
-                    value={reservationData.phone}
-                    onChange={handleInputChange}
-                    required
-                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                  />
-                </div>
+              {formStatus.action === 'reservation' ? (
+                <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
+                  <p className="text-gray-600 text-sm mb-4">
+                    Molimo vas da popunite sva polja kako bismo vas mogli kontaktirati i objasniti sve što vas zanima.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Ime i prezime"
+                      name="name"
+                      value={reservationData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email adresa"
+                      name="email"
+                      value={reservationData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    />
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="email"
-                    placeholder="Email (opciono)"
-                  name="email"
-                  value={reservationData.email}
-                  onChange={handleInputChange}
-                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                />
-                  <select
-                    name="country"
-                    value={reservationData.country}
-                  onChange={handleInputChange}
-                  required
-                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                  >
-                    <option value="">Izaberite državu</option>
-                    <option value="BiH">Bosna i Hercegovina</option>
-                    <option value="HR">Hrvatska</option>
-                    <option value="RS">Srbija</option>
-                    <option value="ME">Crna Gora</option>
-                    <option value="SI">Slovenija</option>
-                    <option value="other">Ostalo</option>
-                  </select>
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="tel"
+                      placeholder="Broj telefona"
+                      name="phone"
+                      value={reservationData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Država"
+                      name="country"
+                      value={reservationData.country}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    />
+                  </div>
 
-                {formStatus.action === 'reservation' && (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="date"
-                        name="check_in"
-                        value={reservationData.check_in}
-                    onChange={handleInputChange}
-                    required
-                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                  />
-                  <input
-                    type="date"
-                        name="check_out"
-                        value={reservationData.check_out}
-                    onChange={handleInputChange}
-                    required
-                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                  />
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="date"
+                      name="date"
+                      value={reservationData.date}
+                      onChange={handleInputChange}
+                      required
+                      min={new Date().toISOString().split('T')[0]}
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    />
+                    <input
+                      type="time"
+                      name="time"
+                      value={reservationData.time}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    />
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="number"
-                  name="guests"
-                  value={reservationData.guests}
-                  onChange={handleInputChange}
-                  required
-                        min="1"
-                        placeholder="Broj gostiju"
-                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                      />
-                <select
-                  name="roomType"
-                  value={reservationData.roomType}
-                  onChange={handleInputChange}
-                  required
+                  <div className="flex justify-center">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
+                    >
+                      Rezerviši termin
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleReservationSubmit} className="space-y-6 animate-slide-up delay-200">
+                  <p className="text-gray-600 text-sm mb-4">
+                    Molimo vas da popunite sva polja kako bismo vas mogli kontaktirati i objasniti sve što vas zanima.
+                  </p>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <select
+                        name="country"
+                        value={reservationData.country}
+                        onChange={handleInputChange}
+                        required
                         className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                       >
-                        <option value="">Odaberite tip smještaja</option>
-                        <optgroup label="Premium smještaj (45 EUR/noć)">
-                          <option value="lux-apartment">LUX Apartmani</option>
-                          <option value="hotel-central">Hotel Central</option>
-                        </optgroup>
-                        <optgroup label="Standardni smještaj (33 EUR/noć)">
-                          <option value="bungalow">Bungalovi</option>
-                          <option value="mountain-house">Planinske kuće</option>
-                          <option value="hotel-horizont">Hotel Horizont</option>
-                          <option value="hotel-depadans">Hotel Depadans</option>
-                        </optgroup>
-                </select>
-              </div>
+                        <option value="">Izaberite državu</option>
+                        <option value="BiH">Bosna i Hercegovina (+387)</option>
+                        <option value="HR">Hrvatska (+385)</option>
+                        <option value="RS">Srbija (+381)</option>
+                        <option value="ME">Crna Gora (+382)</option>
+                        <option value="SI">Slovenija (+386)</option>
+                        <option value="other">Ostalo</option>
+                      </select>
+                    </div>
 
-                <textarea
-                      name="special_requests"
-                      value={reservationData.special_requests}
-                  onChange={handleInputChange}
-                  rows="3"
-                      placeholder="Posebni zahtjevi"
-                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                ></textarea>
-                  </>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Ime i prezime"
+                        name="name"
+                        value={reservationData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500">
+                          {reservationData.country === 'BiH' ? '+387' :
+                           reservationData.country === 'HR' ? '+385' :
+                           reservationData.country === 'RS' ? '+381' :
+                           reservationData.country === 'ME' ? '+382' :
+                           reservationData.country === 'SI' ? '+386' : ''}
+                        </span>
+                      </div>
+                      <input
+                        type="tel"
+                        placeholder="Broj telefona"
+                        name="phone"
+                        value={reservationData.phone}
+                        onChange={handleInputChange}
+                        required
+                        className={`px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641] ${
+                          reservationData.country ? 'pl-16' : ''
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
+                    >
+                      Pošalji zahtjev
+                    </button>
+                  </div>
+                </form>
               )}
-
-                <div className="flex justify-center">
-              <button
-                type="submit"
-                    className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
-                  >
-                    {formStatus.action === 'info' ? 'Pošalji zahtjev' : 'Rezerviši'}
-              </button>
-                </div>
-            </form>
 
               {formStatus.error && (
                 <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg mt-4">
                   {formStatus.error}
-            </div>
+                </div>
               )}
 
               {formStatus.success && (
@@ -994,8 +1076,8 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Rezervacija uspješna!</h3>
-                  <p className="text-gray-600">Uskoro ćemo vas kontaktirati za potvrdu.</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Zahtjev uspješno poslat!</h3>
+                  <p className="text-gray-600">Naša recepcija će vas kontaktirati u najkraćem mogućem roku.</p>
                 </div>
               )}
             </div>
@@ -1004,7 +1086,7 @@ export default function Home() {
       </section>
 
       {/* Live Comments Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 py-3 z-40">
+      {/* <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 py-3 z-40">
         <div className="relative overflow-hidden">
           <div className="animate-scroll flex space-x-8 whitespace-nowrap">
             {[
@@ -1026,7 +1108,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Reservation Form Modal */}
       {showReservationForm && (
@@ -1156,10 +1238,10 @@ export default function Home() {
                             <label className="flex items-center space-x-3">
                               <input
                                 type="radio"
-                        name="roomType"
+                                name="roomType"
                                 value="lux-apartment"
                                 checked={reservationData.roomType === 'lux-apartment'}
-                        onChange={handleInputChange}
+                                onChange={handleInputChange}
                                 className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
                               />
                               <span className="text-gray-700">LUX Apartmani</span>
@@ -1276,148 +1358,130 @@ export default function Home() {
 
       {/* About Us Modal */}
       {showAboutUs && (
-        <div className="fixed inset-0 bg-black/95 z-50 overflow-y-auto">
-          <div className="min-h-screen w-full flex items-start justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-6xl mx-auto my-8 relative animate-slide-up">
-              <button 
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-[90%] xl:max-w-[1400px] overflow-hidden">
+            <div className="relative">
+              <button
                 onClick={() => setShowAboutUs(false)}
-                className="fixed top-4 right-4 md:top-8 md:right-8 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-110 z-50"
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              
-              <div className="p-6 md:p-8 lg:p-12">
-                <h2 className={`text-2xl md:text-3xl lg:text-4xl ${playfair.className} font-bold text-gray-900 mb-6 md:mb-8 text-center`}>
-                  Sportsko-rekreativni centar Ajdinovići
+              <div className="p-4 md:p-6 lg:p-8 xl:p-12">
+                <h2 className={`text-3xl font-bold text-gray-900 mb-6 ${playfair.className}`}>
+                  Saznaj više o nama
                 </h2>
-
-                <div className="max-w-4xl mx-auto mb-8 md:mb-12">
-                  <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
-                    <p className="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-4 md:mb-6">
-                      Naš centar se nalazi u srcu Bosne i Hercegovine, na 950 metara nadmorske visine, na prekrasnom prostoru od 400.000 m². Ovo je mjesto gdje priroda i udobnost stvaraju savršenu kombinaciju za vaš odmor.
-                    </p>
-                    <p className="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-4 md:mb-6">
-                      Već preko 10 godina pružamo nezaboravna iskustva našim gostima, posebno penzionerima koji su našu posebnu pažnju. Naš tim stručnjaka brine o svakom detalju vašeg boravka.
-                    </p>
-                    <div className="text-center mt-6 md:mt-8">
-                      <a 
-                        href="https://www.srca.ba" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-[#009641] hover:text-[#009641]/80 transition-colors"
-                      >
-                        <span className="text-lg md:text-xl font-semibold">Posjetite našu oficijalnu stranicu</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-8">
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/rajKkoz.jpeg"
+                      alt="Hotel Central"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Hotel Central</h3>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                    <div className="bg-[#009641]/10 p-6 md:p-8 rounded-xl">
-                      <h3 className={`text-xl md:text-2xl lg:text-3xl ${playfair.className} font-bold text-gray-900 mb-4 md:mb-6`}>
-                        Zašto baš Ajdinovići?
-                      </h3>
-                      <ul className="space-y-4 md:space-y-6">
-                        <li className="flex items-start">
-                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Prekrasna priroda i čist zrak na 950m nadmorske visine</span>
-                        </li>
-                        <li className="flex items-start">
-                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Moderan wellness centar sa bazenima i spa tretmanima</span>
-                        </li>
-                        <li className="flex items-start">
-                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Vrhunska hrana i piće u all-inclusive sistemu</span>
-                        </li>
-                        <li className="flex items-start">
-                          <svg className="h-6 w-6 md:h-7 md-w-7 text-[#009641] mr-3 md:mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-base md:text-lg lg:text-xl text-gray-700">Raznovrsni programi za zabavu i druženje</span>
-                        </li>
-                      </ul>
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/eX87jl5.jpeg"
+                      alt="Hotel Horizont"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Hotel Horizont</h3>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {[
-                        "/slike/centar1.jpg",
-                        "/slike/centar2.jpg",
-                        "/slike/centar3.jpg",
-                        "/slike/centar4.jpg"
-                      ].map((image, index) => (
-                        <div 
-                          key={index}
-                          className="relative aspect-square rounded-xl overflow-hidden cursor-pointer group"
-                          onClick={() => {
-                            const modal = document.getElementById('galleryModal');
-                            const modalImg = document.getElementById('galleryImage');
-                            modal.classList.remove('hidden');
-                            modalImg.src = image;
-                          }}
-                        >
-                          <Image 
-                            src={image}
-                            alt={`Centar Ajdinovići ${index + 1}`}
-                            fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-110"
-                            sizes="(max-width: 768px) 50vw, 25vw"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </div>
-                      ))}
+                  </div>
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/la2it2V.jpeg"
+                      alt="Hotel Depadans"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Hotel Depadans</h3>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
-                  {[
-                    {
-                      title: "Smještaj",
-                      description: "Udobne sobe, bungalovi i vile sa svim modernim sadržajima",
-                      image: "/slike/smjestaj.jpg"
-                    },
-                    {
-                      title: "Wellness",
-                      description: "Bazeni, sauna, parno kupatilo i spa tretmani",
-                      image: "/slike/wellness.jpg"
-                    },
-                    {
-                      title: "Zabava",
-                      description: "Muzika uživo, folklor, bingo i tematske večeri",
-                      image: "/slike/zabava.jpg"
-                    }
-                  ].map((item, index) => (
-                    <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105">
-                      <div className="relative h-48 md:h-56 lg:h-64">
-                        <Image 
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                        />
-                      </div>
-                      <div className="p-4 md:p-6">
-                        <h3 className={`text-xl md:text-2xl ${playfair.className} font-bold text-gray-900 mb-2 md:mb-3`}>
-                          {item.title}
-                        </h3>
-                        <p className="text-base md:text-lg text-gray-600">
-                          {item.description}
-                        </p>
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-8">
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/EgrAKW8.jpeg"
+                      alt="Bungalovi"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Bungalovi</h3>
                     </div>
-                  ))}
+                  </div>
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/Hs2nXWm.png"
+                      alt="Planinske kuće"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Planinske kuće</h3>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 className={`text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                  Naša hrana
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-8">
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/UzLFwzr.jpeg"
+                      alt="Tradicionalna hrana"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Tradicionalna hrana</h3>
+                    </div>
+                  </div>
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/asCNLpJ.jpeg"
+                      alt="Specijaliteti"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Specijaliteti</h3>
+                    </div>
+                  </div>
+                  <div className="relative h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src="https://i.imgur.com/4i6xdHa.jpeg"
+                      alt="Restoran"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                      <h3 className="text-white text-lg font-semibold">Restoran</h3>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6 max-w-4xl mx-auto">
+                  <p className="text-gray-600 text-lg">
+                    Naš kompleks nudi vrhunski smještaj, izvrsnu hranu i nezaboravno iskustvo u srcu prirode. Otkrijte naše posebne ponude i uživajte u čaroliji planine.
+                  </p>
+                  <p className="text-gray-600 text-lg">
+                    Naš restoran nudi izvrsnu hranu pripremljenu od svježih, lokalnih namirnica. Naši kuhari kombiniraju tradicionalne recepte sa modernim tehnikama kuhanja kako bi stvorili jedinstveno gastronomsko iskustvo.
+                  </p>
+                </div>
+
+                <div className="flex justify-end mt-8">
+                  <button
+                    onClick={() => setShowAboutUs(false)}
+                    className="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
+                  >
+                    Zatvori
+                  </button>
                 </div>
               </div>
             </div>
@@ -1606,6 +1670,74 @@ export default function Home() {
         `
       }} />
       <AccessibilityPanel />
+
+      {/* About Us Section */}
+      <section id="about" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+              Saznaj više o nama
+            </h2>
+            <p className="text-lg text-gray-600">
+              Naš kompleks nudi vrhunski smještaj, izvrsnu hranu i nezaboravno iskustvo u srcu prirode.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="https://i.imgur.com/UzLFwzr.jpeg"
+                alt="Tradicionalna hrana"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                <h3 className="text-white text-xl font-semibold">Tradicionalna hrana</h3>
+              </div>
+            </div>
+            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="https://i.imgur.com/asCNLpJ.jpeg"
+                alt="Specijaliteti"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                <h3 className="text-white text-xl font-semibold">Specijaliteti</h3>
+              </div>
+            </div>
+            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="https://i.imgur.com/4i6xdHa.jpeg"
+                alt="Restoran"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                <h3 className="text-white text-xl font-semibold">Restoran</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h3 className={`text-2xl font-bold text-gray-900 ${playfair.className}`}>
+                Naša priča
+              </h3>
+              <p className="text-gray-600">
+                Smješteni u srcu planine, naš kompleks nudi jedinstveno iskustvo za sve koji žele pobjeći od gradske vreve i uživati u prirodi. Naš tim je posvećen pružanju vrhunske usluge i stvaranju nezaboravnih trenutaka za naše goste.
+              </p>
+              <p className="text-gray-600">
+                Naš restoran nudi izvrsnu hranu pripremljenu od svježih, lokalnih namirnica. Naši kuhari kombiniraju tradicionalne recepte sa modernim tehnikama kuhanja kako bi stvorili jedinstveno gastronomsko iskustvo.
+              </p>
+            </div>
+            <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
+              <img
+                src="https://i.imgur.com/rajKkoz.jpeg"
+                alt="Naš kompleks"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

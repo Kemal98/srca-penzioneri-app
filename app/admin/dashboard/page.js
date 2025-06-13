@@ -939,7 +939,7 @@ export default function AdminDashboard() {
                     Odustani
                   </button>
                   <button
-                  onClick={confirmStatusChange}
+                    onClick={confirmStatusChange}
                     className="px-4 py-2 text-sm font-medium text-black bg-[#ffd700] hover:bg-[#ffd700]/90 rounded-md"
                   >
                     Potvrdi promjenu
@@ -968,7 +968,7 @@ export default function AdminDashboard() {
       )}
     </div>
   );
-}
+} 
 
 // Dodajte ove stilove u vaš CSS
 const styles = `
