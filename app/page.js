@@ -57,6 +57,8 @@ export default function Home() {
   const [currentTripsImageIndex, setCurrentTripsImageIndex] = useState(0);
   const [currentZooImageIndex, setCurrentZooImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(1);
+  const [showImageModal, setShowImageModal] = useState(false);
   
   const foodImages = [
     "https://i.imgur.com/asCNLpJ.jpeg",
@@ -365,9 +367,17 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <button className="bg-[#009641] text-white px-5 py-2 rounded-full text-base font-medium hover:bg-[#009641]/90 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300">
+            {/* <button 
+              className="bg-[#009641] text-white px-5 py-2 rounded-full text-base font-medium hover:bg-[#009641]/90 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300"
+              onClick={() => {
+                setShowReservationForm(true);
+                setTimeout(() => {
+                  document.getElementById('reservationForm')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+            >
               Zatraži poziv
-            </button>
+            </button> */}
           </div>
         </div>
       </header>
@@ -471,12 +481,6 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-300 mt-4">
               <button
-                onClick={() => setShowReservationForm(true)}
-                className="bg-[#009641] text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-[#009641]/90 transition-all shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5 duration-300"
-              >
-                Rezerviši sada
-              </button>
-              <button
                 onClick={() => setShowAboutUs(true)}
                 className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300"
               >
@@ -486,6 +490,126 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* About Us Popup */}
+      {showAboutUs && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-4xl mx-4 relative animate-slide-up max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setShowAboutUs(false)}
+              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:shadow-xl transition-all hover:scale-110"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="p-6">
+              {/* Video Section */}
+              <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden">
+                <iframe
+                  src="https://www.youtube.com/embed/JRYNnhjiyBQ?autoplay=1&controls=1&loop=1&playlist=JRYNnhjiyBQ&showinfo=0&rel=0&modestbranding=1&fs=0&disablekb=1&iv_load_policy=3"
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  style={{ pointerEvents: 'none' }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              <div className="text-center mb-8">
+                <h2 className={`text-3xl ${playfair.className} font-bold text-gray-900 mb-4`}>
+                  Dobrodošli u Sportsko-rekreativni centar Ajdinovići
+                </h2>
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Vaša oaza mira i ugodnosti na 950m nadmorske visine
+                </p>
+              </div>
+              
+              {/* Rest of the About Us content */}
+              <div className="space-y-8 mb-8">
+                {/* Location Section */}
+                <div>
+                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                    Gdje se nalazimo?
+                  </h3>
+                  <p className="text-gray-600 text-base md:text-lg mb-4">
+                    Smješten u srcu Bosne i Hercegovine, na nadmorskoj visini od 950 metara, Sportsko-rekreativni centar Ajdinovići idealno je mjesto za odmor, opuštanje i druženje u prirodi. Nalazimo se tačno na pola puta između Sarajeva i Tuzle, svega 50 kilometara udaljeni od oba grada, što naš centar čini lako dostupnim gostima iz cijele regije.
+                  </p>
+                  <p className="text-gray-600 text-base md:text-lg mb-8">
+                    Već 10 godina pružamo vrhunski all-inclusive doživljaj na površini od preko 400.000 kvadratnih metara netaknute prirode. Naš kompleks zatvorenog tipa nudi savršen spoj prirodnog okruženja i bogatog sadržaja — od uređenih šetnih staza, zoološkog vrta, kafića, restorana sa tradicionalnom bosanskom kuhinjom (pite, domaći kolači, specijaliteti), do modernog wellness & spa centra, unutrašnjih i vanjskih bazena i sportskih terena.
+                  </p>
+
+                  {/* Google Maps Embed */}
+                  <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg mb-8">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d442298.6908528376!2d18.49231485338172!3d44.04845697328216!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475928294f0af933%3A0x1989668180dc04d0!2sSportsko-rekreativni%20centar%20Ajdinovi%C4%87i!5e0!3m2!1sbs!2sba!4v1749847321690!5m2!1sbs!2sba" 
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0 }} 
+                      allowFullScreen="" 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  </div>
+                </div>
+
+                {/* All-inclusive Section */}
+                <div>
+                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                    All-inclusive ponuda za penzionere
+                  </h3>
+                  <p className="text-gray-600 text-base md:text-lg mb-4">
+                    Naša all-inclusive ponuda za penzionere omogućava vam bezbrižan odmor po jedinstvenoj cijeni, bez ijednog dodatnog troška. Do sada su nas posjetile stotine zadovoljnih penzionera iz Srbije, Hrvatske, Sjeverne Makedonije, Slovenije i Crne Gore, a svi su uživali u potpunoj udobnosti i gostoljubivosti našeg centra.
+                  </p>
+                  <div className="bg-gray-50 p-4 md:p-6 rounded-xl mb-8">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">U cijenu boravka uključeni su:</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        smještaj u udobnim objektima (hoteli, vile, planinske kuće, bungalovi)
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        neograničena hrana i piće (bezalkoholno i alkoholno) tokom cijelog boravka
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        pristup slanim sobama, hladnim sobama, hladnim klupama i kompletnom wellness & spa centru
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        korištenje unutrašnjih i vanjskih bazena
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        uživanje u bogatom prirodnom ambijentu i sadržajima našeg centra
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Second Image */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src="https://i.imgur.com/UzLFwzr.jpeg"
+                        alt="Tradicionalna hrana"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src="https://i.imgur.com/la2it2V.jpeg"
+                        alt="Bazeni Ajdinovici"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Welcome Popup */}
       {showWelcomePopup && (
@@ -578,8 +702,8 @@ export default function Home() {
                 currentIndex: currentFoodImageIndex
               },
               { 
-                title: "Zabava",
-                description: "Posebni programi za penzionere",
+                title: "Priroda",
+                description: "Nadmorska visina 950m i povrsina 400.000m2",
                 isSlideshow: true,
                 images: entertainmentImages,
                 currentIndex: currentEntertainmentImageIndex
@@ -666,11 +790,11 @@ export default function Home() {
             <p className="text-2xl font-bold text-gray-900 mb-2">
               Sve ovo po cijeni od SAMO <span className="text-[#ff0000]">33 EUR</span> po noći!
             </p>
-            <p className="text-xl text-gray-600 font-bold">
-              <span className="line-through">66 EUR</span> → 33 EUR (50% POPUSTA)
+            <p className="text-xl text-gray-600 font-bold mb-4">
+              Posebna ponuda za 10. i 11. mjesec - isključivo za penzionere!
             </p>
-            <p className="text-lg text-gray-700 mt-4">
-              👉 Birate sami koliko noći želite ostati
+            <p className="text-lg text-gray-600">
+              Iskoristite našu jesensku ponudu i uživajte u prirodi uz povoljne cijene. Rezervišite svoj boravak već danas!
             </p>
           </div>
         </div>
@@ -1195,343 +1319,229 @@ export default function Home() {
 
       {/* Reservation Form Modal */}
       {showReservationForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 relative animate-slide-up">
-            <button 
-              onClick={() => setShowReservationForm(false)}
-              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:shadow-xl transition-all hover:scale-110"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <div className="p-8">
-              <h2 className={`text-2xl ${playfair.className} font-bold text-gray-900 mb-6 text-center`}>
-                Rezervacija smještaja
-              </h2>
-
-              {formStatus.success ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Rezervacija uspješna!</h3>
-                  <p className="text-gray-600">Uskoro ćemo vas kontaktirati za potvrdu.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleReservationSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Ime i prezime</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={reservationData.name}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                        placeholder="Unesite vaše ime i prezime"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={reservationData.email}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                        placeholder="vasa@email.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={reservationData.phone}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                        placeholder="+387 XX XXX XXX"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Broj gostiju</label>
-                      <select
-                        name="guests"
-                        value={reservationData.guests}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      >
-                        {[1,2,3,4,5,6].map(num => (
-                          <option key={num} value={num}>{num} {num === 1 ? 'osoba' : 'osobe'}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Dolazak</label>
-                      <input
-                        type="date"
-                        name="checkIn"
-                        value={reservationData.checkIn}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Odlazak</label>
-                      <input
-                        type="date"
-                        name="checkOut"
-                        value={reservationData.checkOut}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <div className="bg-[#009641]/10 p-4 rounded-xl mb-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">All-Inclusive ponuda za penzionere</h3>
-                        <p className="text-gray-700 mb-2">Odaberite smještajnu jedinicu sa 50% popusta za penzionere</p>
-                        <div className="flex items-center gap-2 text-[#ff0000] font-bold">
-                          <span className="line-through">90 EUR</span>
-                          <span>→</span>
-                          <span>45 EUR</span>
-                          <span className="text-sm">(Premium smještaj)</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-[#ff0000] font-bold">
-                          <span className="line-through">66 EUR</span>
-                          <span>→</span>
-                          <span>33 EUR</span>
-                          <span className="text-sm">(Standardni smještaj)</span>
-                        </div>
-                      </div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Tip smještaja</label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-4">
-                          <h4 className="font-semibold text-gray-900">Premium smještaj - 45 EUR/noć</h4>
-                          <div className="space-y-2">
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="lux-apartment"
-                                checked={reservationData.roomType === 'lux-apartment'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">LUX Apartmani</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="hotel-central"
-                                checked={reservationData.roomType === 'hotel-central'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Hotel Central</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <h4 className="font-semibold text-gray-900">Standardni smještaj - 33 EUR/noć</h4>
-                          <div className="space-y-2">
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="bungalow"
-                                checked={reservationData.roomType === 'bungalow'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Bungalovi</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="mountain-house"
-                                checked={reservationData.roomType === 'mountain-house'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Planinske kuće</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="hotel-horizont"
-                                checked={reservationData.roomType === 'hotel-horizont'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Hotel Horizont</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="hotel-depadans"
-                                checked={reservationData.roomType === 'hotel-depadans'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Hotel Depadans</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Posebni zahtjevi</label>
-                    <textarea
-                      name="specialRequests"
-                      value={reservationData.specialRequests}
-                      onChange={handleInputChange}
-                      rows="3"
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      placeholder="Unesite sve posebne zahtjeve ili napomene..."
-                    ></textarea>
-                  </div>
-
-                  {formStatus.error && (
-                    <div className="text-red-500 text-sm text-center">{formStatus.error}</div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={formStatus.loading}
-                    className={`w-full bg-[#009641] text-white px-8 py-3 rounded-xl text-lg font-semibold transition-all ${
-                      formStatus.loading 
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : 'hover:bg-[#009641]/90 hover:scale-105 hover:-translate-y-0.5'
-                    }`}
-                  >
-                    {formStatus.loading ? (
-                      <span className="flex items-center justify-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Slanje rezervacije...
-                      </span>
-                    ) : (
-                      'Rezerviši sada'
-                    )}
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* About Us Modal */}
-      {showAboutUs && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-[95%] md:max-w-[90%] lg:max-w-[85%] xl:max-w-[1200px] my-8 relative">
             <button
-              onClick={() => setShowAboutUs(false)}
+              onClick={() => setShowReservationForm(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="p-4 md:p-6 lg:p-8 xl:p-12 max-h-[90vh] overflow-y-auto">
-              <div className="space-y-8 mb-8">
-                {/* Location Section */}
+            <div className="p-4 md:p-6 lg:p-8 xl:p-12 max-h-[90vh] overflow-y-auto" id="reservationForm">
+              <h2 className={`text-2xl md:text-3xl font-bold text-gray-900 mb-6 ${playfair.className}`}>
+                Rezerviši svoj boravak
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                    Gdje se nalazimo
-                  </h3>
-                  <p className="text-gray-600 text-base md:text-lg mb-4">
-                    Smješten u srcu Bosne i Hercegovine, na nadmorskoj visini od 950 metara, Sportsko-rekreativni centar Ajdinovići idealno je mjesto za odmor, opuštanje i druženje u prirodi. Nalazimo se tačno na pola puta između Sarajeva i Tuzle, svega 50 kilometara udaljeni od oba grada, što naš centar čini lako dostupnim gostima iz cijele regije.
-                  </p>
-                  <p className="text-gray-600 text-base md:text-lg mb-8">
-                    Već 10 godina pružamo vrhunski all-inclusive doživljaj na površini od preko 400.000 kvadratnih metara netaknute prirode. Naš kompleks zatvorenog tipa nudi savršen spoj prirodnog okruženja i bogatog sadržaja — od uređenih šetnih staza, zoološkog vrta, kafića, restorana sa tradicionalnom bosanskom kuhinjom (pite, domaći kolači, specijaliteti), do modernog wellness & spa centra, unutrašnjih i vanjskih bazena i sportskih terena.
-                  </p>
-
-                  {/* Google Maps Embed */}
-                  <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg mb-8">
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d442298.6908528376!2d18.49231485338172!3d44.04845697328216!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475928294f0af933%3A0x1989668180dc04d0!2sSportsko-rekreativni%20centar%20Ajdinovi%C4%87i!5e0!3m2!1sbs!2sba!4v1749847321690!5m2!1sbs!2sba" 
-                      width="100%" 
-                      height="100%" 
-                      style={{ border: 0 }} 
-                      allowFullScreen="" 
-                      loading="lazy" 
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Ime i prezime</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={reservationData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                    placeholder="Unesite vaše ime i prezime"
+                  />
                 </div>
-
-                {/* All-inclusive Section */}
                 <div>
-                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
-                    All-inclusive ponuda za penzionere
-                  </h3>
-                  <p className="text-gray-600 text-base md:text-lg mb-4">
-                    Naša all-inclusive ponuda za penzionere omogućava vam bezbrižan odmor po jedinstvenoj cijeni, bez ijednog dodatnog troška. Do sada su nas posjetile stotine zadovoljnih penzionera iz Srbije, Hrvatske, Sjeverne Makedonije, Slovenije i Crne Gore, a svi su uživali u potpunoj udobnosti i gostoljubivosti našeg centra.
-                  </p>
-                  <div className="bg-gray-50 p-4 md:p-6 rounded-xl mb-8">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">U cijenu boravka uključeni su:</h4>
-                    <ul className="space-y-3 text-gray-600">
-                      <li className="flex items-start">
-                        <span className="text-[#ffd700] mr-2">★</span>
-                        smještaj u udobnim objektima (hoteli, vile, planinske kuće, bungalovi)
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-[#ffd700] mr-2">★</span>
-                        neograničena hrana i piće (bezalkoholno i alkoholno) tokom cijelog boravka
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-[#ffd700] mr-2">★</span>
-                        pristup slanim sobama, hladnim sobama, hladnim klupama i kompletnom wellness & spa centru
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-[#ffd700] mr-2">★</span>
-                        korištenje unutrašnjih i vanjskih bazena
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-[#ffd700] mr-2">★</span>
-                        uživanje u bogatom prirodnom ambijentu i sadržajima našeg centra
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Second Image */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
-                      <img
-                        src="https://i.imgur.com/UzLFwzr.jpeg"
-                        alt="Tradicionalna hrana"
-                        className="w-full h-full object-cover"
-                      />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={reservationData.email}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                    placeholder="vasa@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={reservationData.phone}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                    placeholder="+387 XX XXX XXX"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Broj gostiju</label>
+                  <select
+                    name="guests"
+                    value={reservationData.guests}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                  >
+                    {[1,2,3,4,5,6].map(num => (
+                      <option key={num} value={num}>{num} {num === 1 ? 'osoba' : 'osobe'}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Dolazak</label>
+                  <input
+                    type="date"
+                    name="checkIn"
+                    value={reservationData.checkIn}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Odlazak</label>
+                  <input
+                    type="date"
+                    name="checkOut"
+                    value={reservationData.checkOut}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <div className="bg-[#009641]/10 p-4 rounded-xl mb-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">All-Inclusive ponuda za penzionere</h3>
+                    <p className="text-gray-700 mb-2">Odaberite smještajnu jedinicu sa 50% popusta za penzionere</p>
+                    <div className="flex items-center gap-2 text-[#ff0000] font-bold">
+                      <span className="line-through">90 EUR</span>
+                      <span>→</span>
+                      <span>45 EUR</span>
+                      <span className="text-sm">(Premium smještaj)</span>
                     </div>
-                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
-                      <img
-                        src="https://i.imgur.com/la2it2V.jpeg"
-                        alt="Bazeni Ajdinovici"
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="flex items-center gap-2 text-[#ff0000] font-bold">
+                      <span className="line-through">66 EUR</span>
+                      <span>→</span>
+                      <span>33 EUR</span>
+                      <span className="text-sm">(Standardni smještaj)</span>
+                    </div>
+                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tip smještaja</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-900">Premium smještaj - 45 EUR/noć</h4>
+                      <div className="space-y-2">
+                        <label className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name="roomType"
+                            value="lux-apartment"
+                            checked={reservationData.roomType === 'lux-apartment'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                          />
+                          <span className="text-gray-700">LUX Apartmani</span>
+                        </label>
+                        <label className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name="roomType"
+                            value="hotel-central"
+                            checked={reservationData.roomType === 'hotel-central'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                          />
+                          <span className="text-gray-700">Hotel Central</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-900">Standardni smještaj - 33 EUR/noć</h4>
+                      <div className="space-y-2">
+                        <label className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name="roomType"
+                            value="bungalow"
+                            checked={reservationData.roomType === 'bungalow'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                          />
+                          <span className="text-gray-700">Bungalovi</span>
+                        </label>
+                        <label className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name="roomType"
+                            value="mountain-house"
+                            checked={reservationData.roomType === 'mountain-house'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                          />
+                          <span className="text-gray-700">Planinske kuće</span>
+                        </label>
+                        <label className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name="roomType"
+                            value="hotel-horizont"
+                            checked={reservationData.roomType === 'hotel-horizont'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                          />
+                          <span className="text-gray-700">Hotel Horizont</span>
+                        </label>
+                        <label className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name="roomType"
+                            value="hotel-depadans"
+                            checked={reservationData.roomType === 'hotel-depadans'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
+                          />
+                          <span className="text-gray-700">Hotel Depadans</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Posebni zahtjevi</label>
+                <textarea
+                  name="specialRequests"
+                  value={reservationData.specialRequests}
+                  onChange={handleInputChange}
+                  rows="3"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#009641] focus:border-transparent"
+                  placeholder="Unesite sve posebne zahtjeve ili napomene..."
+                ></textarea>
+              </div>
+
+              {formStatus.error && (
+                <div className="text-red-500 text-sm text-center">{formStatus.error}</div>
+              )}
+
+              <button
+                type="submit"
+                disabled={formStatus.loading}
+                className={`w-full bg-[#009641] text-white px-8 py-3 rounded-xl text-lg font-semibold transition-all ${
+                  formStatus.loading 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'hover:bg-[#009641]/90 hover:scale-105 hover:-translate-y-0.5'
+                }`}
+              >
+                {formStatus.loading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Slanje rezervacije...
+                  </span>
+                ) : (
+                  'Rezerviši sada'
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -1540,54 +1550,41 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+          <div className="flex flex-col items-center">
             {/* Logo and Description */}
-            <div className="text-center md:text-left">
+            <div className="text-center max-w-2xl mb-8">
               <Image
                 src="/slike/logo.png"
                 alt="Ajdinovići Logo"
-                width={200}
-                height={80}
-                className="h-16 w-auto mx-auto md:mx-0 mb-4"
+                width={400}
+                height={160}
+                className="h-32 w-auto mx-auto mb-6"
               />
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm mb-4">
                 Sportsko-rekreativni centar Ajdinovići - Vaša oaza mira i ugodnosti na 950m nadmorske visine
               </p>
+              <div className="bg-[#009641]/10 p-4 rounded-lg mb-4">
+                <p className="text-[#009641] font-semibold mb-2">Posebna ponuda za 10. i 11. mjesec!</p>
+                <p className="text-gray-600 text-sm">
+                  Iskoristite našu jesensku ponudu i uživajte u prirodi uz povoljne cijene. Rezervišite svoj boravak već danas!
+                </p>
+              </div>
               <a 
                 href="https://www.srca.ba" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-[#009641] hover:text-[#009641]/80 transition-colors text-sm mt-2 inline-block"
+                className="text-[#009641] hover:text-[#009641]/80 transition-colors text-sm inline-block"
               >
                 Posjetite naš oficijalni sajt →
               </a>
             </div>
 
-            {/* Quick Links */}
-            <div className="text-center">
-              <h3 className={`text-lg ${playfair.className} font-bold mb-4 text-gray-900`}>Brzi linkovi</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#about" className="text-gray-600 hover:text-[#009641] transition-colors">O nama</a>
-                </li>
-                <li>
-                  <a href="#services" className="text-gray-600 hover:text-[#009641] transition-colors">Usluge</a>
-                </li>
-                <li>
-                  <a href="#contact" className="text-gray-600 hover:text-[#009641] transition-colors">Kontakt</a>
-                </li>
-                <li>
-                  <a href="#reservation" className="text-gray-600 hover:text-[#009641] transition-colors">Rezervacija</a>
-                </li>
-              </ul>
-            </div>
-
             {/* Social Media and Contact */}
-            <div className="text-center md:text-right">
+            <div className="text-center">
               <h3 className={`text-lg ${playfair.className} font-bold mb-4 text-gray-900`}>Pratite nas</h3>
-              <div className="flex justify-center md:justify-end space-x-4 mb-4">
+              <div className="flex justify-center space-x-4 mb-4">
                 <a 
-                  href="https://www.facebook.com/ajdinovici" 
+                  href="https://www.facebook.com/srcajdinovici" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-[#009641] transition-colors"
