@@ -11,12 +11,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  themeColor: '#009641',
+};
+
 export const metadata = {
   title: "Ajdinovići - All Inclusive Centar",
   description: "Jedini all-inclusive centar u BiH",
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
@@ -31,14 +34,12 @@ export const metadata = {
     ],
   },
   manifest: '/site.webmanifest',
-  themeColor: '#009641',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="bs">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
