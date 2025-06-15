@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Inter, Playfair_Display, Montserrat, Poppins } from 'next/font/google';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from './lib/supabase';
 import AccessibilityPanel from './components/AccessibilityPanel';
 import { sendSMS, formatReservationMessage } from './lib/infobip';
@@ -62,6 +62,8 @@ export default function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(1);
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentReelIndex, setCurrentReelIndex] = useState(0);
+  const reelsRef = useRef(null);
+  const videoRef = useRef(null);
   
   const accommodationImages = [
     "https://i.imgur.com/4X7Q5Z7.jpeg",
@@ -186,56 +188,103 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const intervals = [
-      setInterval(() => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-          setCurrentFoodImageIndex((prevIndex) => 
-            prevIndex === foodImages.length - 1 ? 0 : prevIndex + 1
-          );
-          setIsTransitioning(false);
-        }, 1000);
-      }, 5000),
-      setInterval(() => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-          setCurrentAccommodationImageIndex((prevIndex) => 
-            prevIndex === accommodationImages.length - 1 ? 0 : prevIndex + 1
-          );
-          setIsTransitioning(false);
-        }, 1000);
-      }, 5000),
-      setInterval(() => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-          setCurrentWellnessImageIndex((prevIndex) => 
-            prevIndex === wellnessImages.length - 1 ? 0 : prevIndex + 1
-          );
-          setIsTransitioning(false);
-        }, 1000);
-      }, 5000),
-      setInterval(() => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-          setCurrentEntertainmentImageIndex((prevIndex) => 
-            prevIndex === entertainmentImages.length - 1 ? 0 : prevIndex + 1
-          );
-          setIsTransitioning(false);
-        }, 1000);
-      }, 5000),
-      setInterval(() => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-          setCurrentZooImageIndex((prevIndex) => 
-            prevIndex === zooImages.length - 1 ? 0 : prevIndex + 1
-          );
-          setIsTransitioning(false);
-        }, 1000);
-      }, 5000)
-    ];
+    const accommodationInterval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentAccommodationImageIndex((prevIndex) =>
+          prevIndex === accommodationImages.length - 1 ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false);
+      }, 1000);
+    }, 5000); // 5 sekundi
 
-    return () => intervals.forEach(interval => clearInterval(interval));
+    const wellnessInterval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentWellnessImageIndex((prevIndex) =>
+          prevIndex === wellnessImages.length - 1 ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false);
+      }, 1000);
+    }, 5500); // 5.5 sekundi
+
+    const foodInterval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentFoodImageIndex((prevIndex) =>
+          prevIndex === foodImages.length - 1 ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false);
+      }, 1000);
+    }, 6000); // 6 sekundi
+
+    const entertainmentInterval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentEntertainmentImageIndex((prevIndex) =>
+          prevIndex === entertainmentImages.length - 1 ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false);
+      }, 1000);
+    }, 6500); // 6.5 sekundi
+
+    const zooInterval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentZooImageIndex((prevIndex) =>
+          prevIndex === zooImages.length - 1 ? 0 : prevIndex + 1
+        );
+        setIsTransitioning(false);
+      }, 1000);
+    }, 7000); // 7 sekundi
+
+    return () => {
+      clearInterval(accommodationInterval);
+      clearInterval(wellnessInterval);
+      clearInterval(foodInterval);
+      clearInterval(entertainmentInterval);
+      clearInterval(zooInterval);
+    };
   }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const currentVideo = document.querySelector(`video[data-index="${currentReelIndex}"]`);
+          if (entry.isIntersecting) {
+            if (currentVideo) {
+              currentVideo.play();
+            }
+          } else {
+            if (currentVideo) {
+              currentVideo.pause();
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (reelsRef.current) {
+      observer.observe(reelsRef.current);
+    }
+
+    return () => {
+      if (reelsRef.current) {
+        observer.unobserve(reelsRef.current);
+      }
+    };
+  }, [currentReelIndex]);
+
+  // Pause all videos except current one
+  useEffect(() => {
+    document.querySelectorAll('video').forEach((video, index) => {
+      if (index !== currentReelIndex) {
+        video.pause();
+      }
+    });
+  }, [currentReelIndex]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -348,6 +397,37 @@ export default function Home() {
       [name]: value
     }));
   };
+
+  useEffect(() => {
+    // Handle scroll animations
+    const handleScroll = () => {
+      const elements = document.querySelectorAll('.animate-on-scroll');
+      elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementBottom = element.getBoundingClientRect().bottom;
+        const isVisible = (elementTop < window.innerHeight) && (elementBottom >= 0);
+        
+        if (isVisible) {
+          element.classList.add('animate-fade-in');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Video autoplay failed:", error);
+      });
+    }
+  }, []);
 
   return (
     <div className={`min-h-screen bg-white ${poppins.className}`}>
@@ -498,11 +578,16 @@ export default function Home() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-2xl w-full max-w-4xl mx-4 relative animate-slide-up max-h-[90vh] overflow-y-auto">
             <button 
-              onClick={() => setShowAboutUs(false)}
-              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:shadow-xl transition-all hover:scale-110"
+              onClick={() => {
+                setShowAboutUs(false);
+                if (videoRef.current) {
+                  videoRef.current.pause();
+                }
+              }}
+              className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-110 z-50"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             
@@ -510,9 +595,8 @@ export default function Home() {
               {/* Video Section */}
               <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden">
                 <iframe
-                  src="https://www.youtube.com/embed/JRYNnhjiyBQ?autoplay=1&controls=1&loop=1&playlist=JRYNnhjiyBQ&showinfo=0&rel=0&modestbranding=1&fs=0&disablekb=1&iv_load_policy=3"
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  style={{ pointerEvents: 'none' }}
+                  src="https://www.youtube.com/embed/JRYNnhjiyBQ?autoplay=1&controls=1&loop=1&playlist=JRYNnhjiyBQ&showinfo=0&rel=0&modestbranding=1&fs=1&disablekb=1&iv_load_policy=3&playsinline=1"
+                  className="absolute inset-0 w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
@@ -680,7 +764,7 @@ export default function Home() {
             <p className="text-base text-gray-600 animate-slide-up delay-100">Bez doplata. Bez troškova.</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {[
               { 
                 title: "Smještaj",
@@ -1589,7 +1673,7 @@ export default function Home() {
       )}
 
       {/* Video Reels Section */}
-      <div className="bg-black py-16">
+      <div className="bg-black py-16" ref={reelsRef}>
         <div className="container mx-auto px-4">
           <h2 className={`text-3xl md:text-4xl font-bold text-center mb-12 ${playfair.className} text-white`}>
             Pogledajte naše video snimke
@@ -1601,23 +1685,13 @@ export default function Home() {
                   <div key={num} className="w-full flex-shrink-0 aspect-[9/16]">
                     <video 
                       className="w-full h-full object-cover"
-                      controls
                       playsInline
-                      autoPlay={currentReelIndex === num - 1}
-                      muted={currentReelIndex !== num - 1}
+                      controls
                       poster={`/slike/reels/${num}.jpg`}
+                      data-index={num - 1}
                       onEnded={() => {
                         if (currentReelIndex < 5) {
                           setCurrentReelIndex(prev => prev + 1);
-                        }
-                      }}
-                      ref={(el) => {
-                        if (el) {
-                          if (currentReelIndex === num - 1) {
-                            el.play();
-                          } else {
-                            el.pause();
-                          }
                         }
                       }}
                     >
@@ -1633,8 +1707,6 @@ export default function Home() {
             <button 
               onClick={() => {
                 setCurrentReelIndex(prev => Math.max(0, prev - 1));
-                // Pause all videos
-                document.querySelectorAll('video').forEach(video => video.pause());
               }}
               className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all"
               disabled={currentReelIndex === 0}
@@ -1646,8 +1718,6 @@ export default function Home() {
             <button 
               onClick={() => {
                 setCurrentReelIndex(prev => Math.min(5, prev + 1));
-                // Pause all videos
-                document.querySelectorAll('video').forEach(video => video.pause());
               }}
               className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all"
               disabled={currentReelIndex === 5}
@@ -1662,11 +1732,7 @@ export default function Home() {
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <button
                   key={num}
-                  onClick={() => {
-                    setCurrentReelIndex(num - 1);
-                    // Pause all videos
-                    document.querySelectorAll('video').forEach(video => video.pause());
-                  }}
+                  onClick={() => setCurrentReelIndex(num - 1)}
                   className={`w-2 h-2 rounded-full transition-all ${
                     currentReelIndex === num - 1 ? 'bg-white w-4' : 'bg-white/50'
                   }`}
@@ -1702,13 +1768,13 @@ export default function Home() {
               <p className="text-[#009641] font-semibold mb-4">Jedini all-inclusive centar u BiH</p>
               <a 
                 href="https://www.srca.ba" 
-                target="_blank" 
-                rel="noopener noreferrer"
+            target="_blank"
+            rel="noopener noreferrer"
                 className="text-[#009641] hover:text-[#009641]/80 transition-colors text-sm inline-block"
-              >
+          >
                 Posjetite naš zvanični sajt →
-              </a>
-            </div>
+          </a>
+        </div>
 
             {/* Social Media and Contact */}
             <div className="text-center">
@@ -1716,22 +1782,32 @@ export default function Home() {
               <div className="flex justify-center space-x-4 mb-4">
                 <a 
                   href="https://www.facebook.com/srcajdinovici" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+          target="_blank"
+          rel="noopener noreferrer"
                   className="text-gray-600 hover:text-[#009641] transition-colors"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
                   </svg>
-                </a>
-                <a 
-                  href="https://www.instagram.com/ajdinovici" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+        </a>
+        <a
+                  href="https://www.instagram.com/srcajdinovici/" 
+          target="_blank"
+          rel="noopener noreferrer"
                   className="text-gray-600 hover:text-[#009641] transition-colors"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 011.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 01-1.153 1.772 4.915 4.915 0 01-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 01-1.772-1.153 4.904 4.904 0 01-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 011.153-1.772A4.897 4.897 0 015.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm6.5-.25a1.25 1.25 0 10-2.5 0 1.25 1.25 0 002.5 0zM12 9a3 3 0 110 6 3 3 0 010-6z"/>
+                  </svg>
+        </a>
+        <a
+                  href="https://www.tiktok.com/@ajdinovici" 
+          target="_blank"
+          rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-[#009641] transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
                   </svg>
                 </a>
               </div>
