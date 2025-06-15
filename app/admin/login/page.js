@@ -26,6 +26,7 @@ export default function AdminLogin() {
 
       if (email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
         console.log('Login successful, redirecting...');
+        localStorage.setItem('adminToken', 'authenticated');
         router.push('/admin/dashboard');
       } else {
         console.log('Login failed: Invalid credentials');
