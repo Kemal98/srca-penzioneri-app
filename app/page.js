@@ -465,19 +465,19 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen pt-20">
+      <section className="relative h-[80vh] md:h-[80vh] lg:h-screen pt-20">
         <div className="absolute inset-0">
           <Image
             src="/slike/naslovna.jpg"
             alt="Penzion za penzionere"
             fill
             className="object-cover"
-          priority
-        />
+            priority
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80"></div>
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 min-h-screen flex flex-col justify-center items-center text-center">
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
           <div className="max-w-3xl space-y-4 animate-fade-in-up">
             <h1 className={`text-4xl md:text-5xl ${playfair.className} text-white font-bold leading-tight animate-slide-up`}>
               POSEBNA PONUDA ZA PENZIONERE
