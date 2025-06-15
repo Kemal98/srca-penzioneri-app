@@ -780,7 +780,7 @@ export default function Home() {
             ].map((item, index) => (
               <div key={index} className="space-y-2">
                 <div 
-                  className="relative h-48 rounded-xl overflow-hidden cursor-pointer group"
+                  className="relative h-72 md:h-48 rounded-xl overflow-hidden cursor-pointer group"
                   onClick={() => {
                     const modal = document.getElementById('imageModal');
                     const modalImg = document.getElementById('modalImage');
