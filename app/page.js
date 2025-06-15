@@ -375,10 +375,13 @@ export default function Home() {
         specialRequests: ''
       });
       
-      // Zatvori modal ako je otvoren
-      if (showReservationForm) {
-        setShowReservationForm(false);
-      }
+      // Zatvori modal
+      setShowReservationForm(false);
+      
+      // Automatski sakrij notifikaciju nakon 5 sekundi
+      setTimeout(() => {
+        setFormStatus(prev => ({ ...prev, success: false }));
+      }, 5000);
       
     } catch (error) {
       console.error('Greška u slanju forme:', error);
@@ -448,17 +451,16 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <a 
-                href="#reservationForm"
+              <button 
+                type="button"
                 className="bg-[#009641] text-white px-5 py-2 rounded-full text-base font-medium hover:bg-[#009641]/90 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300"
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   setReservationType('call');
-                  document.getElementById('reservationForm')?.scrollIntoView({ behavior: 'smooth' });
+                  setShowReservationForm(true);
                 }}
               >
-                Zatraži poziv
-              </a>
+                Pozovite me
+              </button>
             </div>
           </div>
         </div>
@@ -1399,275 +1401,110 @@ export default function Home() {
         </div>
       </div> */}
 
-      {/* Reservation Form Popup */}
+      {/* Success Notification */}
+      {formStatus.success && (
+        <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50 animate-slide-in">
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-gray-900">Zahtjev uspješno poslat!</h4>
+              <p className="text-sm text-gray-500">Naša recepcija će vas kontaktirati u najkraćem mogućem roku.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Call Request Popup */}
       {showReservationForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-md mx-4 relative animate-slide-up">
-            <button 
-              onClick={() => setShowReservationForm(false)}
-              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:shadow-xl transition-all hover:scale-110"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <h3 className={`text-xl ${playfair.className} font-bold text-gray-900 mb-2`}>
-                  Rezervišite svoj boravak
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Popunite formu i mi ćemo vas kontaktirati u najkraćem mogućem roku
-                </p>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-slide-up">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className={`text-xl font-semibold ${playfair.className}`}>Zatražite poziv</h3>
+              <button
+                onClick={() => setShowReservationForm(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleReservationSubmit} className="space-y-4">
+              <div className="relative">
+                <select
+                  name="country"
+                  value={reservationData.country}
+                  onChange={handleInputChange}
+                  required
+                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                >
+                  <option value="">Izaberite državu</option>
+                  <option value="BiH">Bosna i Hercegovina (+387)</option>
+                  <option value="HR">Hrvatska (+385)</option>
+                  <option value="RS">Srbija (+381)</option>
+                  <option value="ME">Crna Gora (+382)</option>
+                  <option value="SI">Slovenija (+386)</option>
+                  <option value="other">Ostalo</option>
+                </select>
               </div>
 
-              <form onSubmit={handleReservationSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Ime i prezime
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={reservationData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                    placeholder="Unesite vaše ime i prezime"
-                  />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Ime i prezime"
+                  name="name"
+                  value={reservationData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                />
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-gray-500">
+                    {reservationData.country === 'BiH' ? '+387' :
+                     reservationData.country === 'HR' ? '+385' :
+                     reservationData.country === 'RS' ? '+381' :
+                     reservationData.country === 'ME' ? '+382' :
+                     reservationData.country === 'SI' ? '+386' : ''}
+                  </span>
                 </div>
+                <input
+                  type="tel"
+                  placeholder="Broj telefona"
+                  name="phone"
+                  value={reservationData.phone}
+                  onChange={handleInputChange}
+                  required
+                  className={`px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641] ${
+                    reservationData.country ? 'pl-16' : ''
+                  }`}
+                />
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Broj telefona
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={reservationData.phone}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                    placeholder="Unesite vaš broj telefona"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email adresa
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={reservationData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                    placeholder="Unesite vašu email adresu"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Želite da vas pozovemo?
-                  </label>
-                  <div className="flex items-center space-x-4">
-                    <label className={`flex items-center px-4 py-2 rounded-lg ${reservationType === 'call' ? 'bg-[#009641] text-white' : 'bg-gray-50 text-gray-700'} transition-all`}>
-                      <input
-                        type="radio"
-                        name="reservationType"
-                        value="call"
-                        checked={reservationType === 'call'}
-                        onChange={() => setReservationType('call')}
-                        className="h-4 w-4 text-white focus:ring-[#009641] border-gray-300"
-                      />
-                      <span className="ml-2 text-sm font-medium">
-                        Da, želim da me pozovete
-                      </span>
-                    </label>
-                    <label className={`flex items-center px-4 py-2 rounded-lg ${reservationType === 'reservation' ? 'bg-[#009641] text-white' : 'bg-gray-50 text-gray-700'} transition-all`}>
-                      <input
-                        type="radio"
-                        name="reservationType"
-                        value="reservation"
-                        checked={reservationType === 'reservation'}
-                        onChange={() => setReservationType('reservation')}
-                        className="h-4 w-4 text-white focus:ring-[#009641] border-gray-300"
-                      />
-                      <span className="ml-2 text-sm font-medium">
-                        Želim rezervaciju
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
-                {reservationType === 'reservation' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Broj gostiju
-                      </label>
-                      <select
-                        name="guests"
-                        value={reservationData.guests}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      >
-                        {[1,2,3,4,5,6].map(num => (
-                          <option key={num} value={num}>{num} {num === 1 ? 'osoba' : 'osobe'}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Dolazak
-                      </label>
-                      <input
-                        type="date"
-                        name="checkIn"
-                        value={reservationData.checkIn}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Odlazak
-                      </label>
-                      <input
-                        type="date"
-                        name="checkOut"
-                        value={reservationData.checkOut}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tip smještaja
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-4">
-                          <h4 className="font-semibold text-gray-900">Premium smještaj - 45 EUR/noć</h4>
-                          <div className="space-y-2">
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="lux-apartment"
-                                checked={reservationData.roomType === 'lux-apartment'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">LUX Apartmani</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="hotel-central"
-                                checked={reservationData.roomType === 'hotel-central'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Hotel Central</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <h4 className="font-semibold text-gray-900">Standardni smještaj - 33 EUR/noć</h4>
-                          <div className="space-y-2">
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="bungalow"
-                                checked={reservationData.roomType === 'bungalow'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Bungalovi</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="mountain-house"
-                                checked={reservationData.roomType === 'mountain-house'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Planinske kuće</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="hotel-horizont"
-                                checked={reservationData.roomType === 'hotel-horizont'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Hotel Horizont</span>
-                            </label>
-                            <label className="flex items-center space-x-3">
-                              <input
-                                type="radio"
-                                name="roomType"
-                                value="hotel-depadans"
-                                checked={reservationData.roomType === 'hotel-depadans'}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-[#009641] focus:ring-[#009641]"
-                              />
-                              <span className="text-gray-700">Hotel Depadans</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Posebni zahtjevi
-                      </label>
-                      <textarea
-                        name="specialRequests"
-                        value={reservationData.specialRequests}
-                        onChange={handleInputChange}
-                        rows="3"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009641] focus:border-transparent"
-                        placeholder="Unesite sve posebne zahtjeve ili napomene..."
-                      ></textarea>
-                    </div>
-                  </>
-                )}
-
-                <button 
+              <div className="flex justify-center">
+                <button
                   type="submit"
-                  disabled={formStatus.loading}
-                  className="w-full bg-[#009641] text-white px-4 py-2.5 rounded-xl text-base font-semibold hover:bg-[#009641]/90 transition-all shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5 duration-300"
+                  className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#009641] hover:bg-[#009641]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009641] transition-all"
                 >
-                  {formStatus.loading ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Slanje rezervacije...
-                    </span>
-                  ) : (
-                    'Pošalji'
-                  )}
+                  Pošalji zahtjev
                 </button>
-              </form>
-            </div>
+              </div>
+            </form>
+
+            {formStatus.error && (
+              <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg mt-4">
+                {formStatus.error}
+              </div>
+            )}
           </div>
         </div>
       )}
