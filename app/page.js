@@ -61,6 +61,7 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(1);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [currentReelIndex, setCurrentReelIndex] = useState(0);
   
   const accommodationImages = [
     "https://i.imgur.com/4X7Q5Z7.jpeg",
@@ -494,34 +495,119 @@ export default function Home() {
 
       {/* About Us Popup */}
       {showAboutUs && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-4xl mx-4 relative animate-slide-up max-h-[90vh] overflow-y-auto">
             <button 
-              className="absolute top-4 right-4 text-gray-500 hover:text-[#009641] transition-colors z-10"
               onClick={() => setShowAboutUs(false)}
+              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:shadow-xl transition-all hover:scale-110"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="relative aspect-w-16 aspect-h-9">
-              <video 
-                className="w-full h-full object-cover"
-                controls
-                playsInline
-                poster="https://i.imgur.com/xtE0obe.png"
-              >
-                <source src="https://i.imgur.com/xtE0obe.mp4" type="video/mp4" />
-                Vaš browser ne podržava video tag.
-              </video>
-            </div>
+            
             <div className="p-6">
-              <h2 className={`text-2xl ${playfair.className} font-bold text-gray-900 mb-4`}>
-                Sportsko-rekreativni centar Ajdinovići
-              </h2>
-              <p className={`text-base ${montserrat.className} text-gray-600 leading-relaxed`}>
-                Na 950 metara nadmorske visine, na 400.000 m² u srcu Bosne i Hercegovine, nalazi se jedinstveni all-inclusive centar koji nudi sve što vam je potrebno za savršen odmor. Uživajte u prirodi, wellness centru, zoološkom vrtu i farmi, te mnogim drugim sadržajima - sve uključeno u jedinstvenu cijenu.
-              </p>
+              {/* Video Section */}
+              <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden">
+                <iframe
+                  src="https://www.youtube.com/embed/JRYNnhjiyBQ?autoplay=1&controls=1&loop=1&playlist=JRYNnhjiyBQ&showinfo=0&rel=0&modestbranding=1&fs=0&disablekb=1&iv_load_policy=3"
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  style={{ pointerEvents: 'none' }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              <div className="text-center mb-8">
+                <h2 className={`text-3xl ${playfair.className} font-bold text-gray-900 mb-4`}>
+                  Dobrodošli u Sportsko-rekreativni centar Ajdinovići
+                </h2>
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Vaša oaza mira i ugodnosti na 950m nadmorske visine
+                </p>
+              </div>
+              
+              {/* Rest of the About Us content */}
+              <div className="space-y-8 mb-8">
+                {/* Location Section */}
+                <div>
+                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                    Gdje se nalazimo?
+                  </h3>
+                  <p className="text-gray-600 text-base md:text-lg mb-4">
+                    Smješten u srcu Bosne i Hercegovine, na nadmorskoj visini od 950 metara, Sportsko-rekreativni centar Ajdinovići idealno je mjesto za odmor, opuštanje i druženje u prirodi. Nalazimo se tačno na pola puta između Sarajeva i Tuzle, svega 50 kilometara udaljeni od oba grada, što naš centar čini lako dostupnim gostima iz cijele regije.
+                  </p>
+                  <p className="text-gray-600 text-base md:text-lg mb-8">
+                    Već 10 godina pružamo vrhunski all-inclusive doživljaj na površini od preko 400.000 kvadratnih metara netaknute prirode. Naš kompleks zatvorenog tipa nudi savršen spoj prirodnog okruženja i bogatog sadržaja — od uređenih šetnih staza, zoološkog vrta, kafića, restorana sa tradicionalnom bosanskom kuhinjom (pite, domaći kolači, specijaliteti), do modernog wellness & spa centra, unutrašnjih i vanjskih bazena i sportskih terena.
+                  </p>
+
+                  {/* Google Maps Embed */}
+                  <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg mb-8">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d442298.6908528376!2d18.49231485338172!3d44.04845697328216!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475928294f0af933%3A0x1989668180dc04d0!2sSportsko-rekreativni%20centar%20Ajdinovi%C4%87i!5e0!3m2!1sbs!2sba!4v1749847321690!5m2!1sbs!2sba" 
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0 }} 
+                      allowFullScreen="" 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  </div>
+                </div>
+
+                {/* All-inclusive Section */}
+                <div>
+                  <h3 className={`text-xl md:text-2xl font-bold text-gray-900 mb-4 ${playfair.className}`}>
+                    All-inclusive ponuda za penzionere
+                  </h3>
+                  <p className="text-gray-600 text-base md:text-lg mb-4">
+                    Naša all-inclusive ponuda za penzionere omogućava vam bezbrižan odmor po jedinstvenoj cijeni, bez ijednog dodatnog troška. Do sada su nas posjetile stotine zadovoljnih penzionera iz Srbije, Hrvatske, Sjeverne Makedonije, Slovenije i Crne Gore, a svi su uživali u potpunoj udobnosti i gostoljubivosti našeg centra.
+                  </p>
+                  <div className="bg-gray-50 p-4 md:p-6 rounded-xl mb-8">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">U cijenu boravka uključeni su:</h4>
+                    <ul className="space-y-3 text-gray-600">
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        smještaj u udobnim objektima (hoteli, vile, planinske kuće, bungalovi)
+          </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        neograničena hrana i piće (bezalkoholno i alkoholno) tokom cijelog boravka
+          </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        pristup slanim sobama, hladnim sobama, hladnim klupama i kompletnom wellness & spa centru
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        korištenje unutrašnjih i vanjskih bazena
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-[#ffd700] mr-2">★</span>
+                        uživanje u bogatom prirodnom ambijentu i sadržajima našeg centra
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Second Image */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src="https://i.imgur.com/UzLFwzr.jpeg"
+                        alt="Tradicionalna hrana"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="relative h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src="https://i.imgur.com/la2it2V.jpeg"
+                        alt="Bazeni Ajdinovici"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -693,11 +779,10 @@ export default function Home() {
             <p className={`text-lg ${montserrat.className} text-gray-700 text-center italic leading-relaxed`}>
               Na 950 metara nadmorske visine, na 400.000 m² u srcu Bosne i Hercegovine — sve na jednom mjestu za vaš savršen odmor i opuštanje.
             </p>
+            <p className={`text-lg ${montserrat.className} text-gray-700 text-center mt-4 leading-relaxed`}>
+              Uz jedinstvenu cijenu dobijate: buffet doručak, ručak i večeru, neograničena pića (točeno pivo, vino, sokovi, kafa, čaj), pristup unutrašnjem i vanjskim bazenima, jacuzziju, saunama, slanoj i hladnoj sobi, fitness centru, zoološkom vrtu i farmi, te uređenim stazama kroz crnogoričnu šumu.
+            </p>
           </div>
-
-          <p className={`text-base ${montserrat.className} text-gray-600 text-center mb-6`}>
-            Uz cijenu dobijate: buffet obroke, neograničena pića, pristup bazenima, wellness centru, zoološkom vrtu i šetnju šumom.
-          </p>
 
           <div className="bg-[#009641]/10 p-6 rounded-2xl text-center">
             <p className="text-2xl font-bold text-gray-900 mb-2">
@@ -1502,6 +1587,95 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Video Reels Section */}
+      <div className="bg-black py-16">
+        <div className="container mx-auto px-4">
+          <h2 className={`text-3xl md:text-4xl font-bold text-center mb-12 ${playfair.className} text-white`}>
+            Pogledajte naše video snimke
+          </h2>
+          <div className="relative max-w-md mx-auto">
+            <div className="overflow-hidden rounded-2xl">
+              <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${currentReelIndex * 100}%)` }}>
+                {[1, 2, 3, 4, 5, 6].map((num) => (
+                  <div key={num} className="w-full flex-shrink-0 aspect-[9/16]">
+                    <video 
+                      className="w-full h-full object-cover"
+                      controls
+                      playsInline
+                      autoPlay={currentReelIndex === num - 1}
+                      muted={currentReelIndex !== num - 1}
+                      poster={`/slike/reels/${num}.jpg`}
+                      onEnded={() => {
+                        if (currentReelIndex < 5) {
+                          setCurrentReelIndex(prev => prev + 1);
+                        }
+                      }}
+                      ref={(el) => {
+                        if (el) {
+                          if (currentReelIndex === num - 1) {
+                            el.play();
+                          } else {
+                            el.pause();
+                          }
+                        }
+                      }}
+                    >
+                      <source src={`/slike/reels/${num}.mp4`} type="video/mp4" />
+                      Vaš browser ne podržava video tag.
+                    </video>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button 
+              onClick={() => {
+                setCurrentReelIndex(prev => Math.max(0, prev - 1));
+                // Pause all videos
+                document.querySelectorAll('video').forEach(video => video.pause());
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all"
+              disabled={currentReelIndex === 0}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button 
+              onClick={() => {
+                setCurrentReelIndex(prev => Math.min(5, prev + 1));
+                // Pause all videos
+                document.querySelectorAll('video').forEach(video => video.pause());
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all"
+              disabled={currentReelIndex === 5}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Dots Navigation */}
+            <div className="flex justify-center gap-2 mt-4">
+              {[1, 2, 3, 4, 5, 6].map((num) => (
+                <button
+                  key={num}
+                  onClick={() => {
+                    setCurrentReelIndex(num - 1);
+                    // Pause all videos
+                    document.querySelectorAll('video').forEach(video => video.pause());
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    currentReelIndex === num - 1 ? 'bg-white w-4' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-12">
