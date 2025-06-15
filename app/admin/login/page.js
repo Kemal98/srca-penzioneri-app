@@ -18,13 +18,21 @@ export default function AdminLogin() {
     setError('');
 
     try {
+      console.log('Attempting login with:', { email });
+      console.log('Environment variables:', {
+        adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+        hasPassword: !!process.env.NEXT_PUBLIC_ADMIN_PASSWORD
+      });
+
       if (email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-        // Uspješna prijava
+        console.log('Login successful, redirecting...');
         router.push('/admin/dashboard');
       } else {
+        console.log('Login failed: Invalid credentials');
         setError('Pogrešan email ili lozinka');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Došlo je do greške prilikom prijave');
     }
   };

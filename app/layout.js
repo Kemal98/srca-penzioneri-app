@@ -25,12 +25,11 @@ export const metadata = {
       { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
     ],
     apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
-      { url: '/apple-icon-precomposed.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
     other: [
-      { url: '/android-icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/ms-icon-310x310.png', sizes: '310x310', type: 'image/png' },
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/mstile-310x310.png', sizes: '310x310', type: 'image/png' },
     ],
   },
   manifest: '/site.webmanifest',
@@ -43,11 +42,10 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
-        <link rel="apple-touch-icon-precomposed" href="/apple-icon-precomposed.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="msapplication-TileColor" content="#009641" />
-        <meta name="msapplication-TileImage" content="/ms-icon-310x310.png" />
+        <meta name="msapplication-TileImage" content="/mstile-310x310.png" />
         <meta name="theme-color" content="#009641" />
       </head>
       <body
