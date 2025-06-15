@@ -309,38 +309,19 @@ export default function Home() {
         throw new Error('Molimo unesite ispravan broj telefona (npr. 0603422909 ili +387603422909)');
       }
 
-      // Ako je rezervacija, provjeri dodatna polja
-      if (reservationData.action === 'reservation') {
-        if (!reservationData.checkIn || !reservationData.checkOut || !reservationData.roomType) {
-          throw new Error('Molimo popunite sva polja za rezervaciju (datume dolaska, odlaska i tip smještaja)');
-        }
-      }
-
       const data = {
         name: reservationData.name,
         phone: reservationData.phone,
         email: reservationData.email || '',
         country: reservationData.country,
-        action: reservationData.action || 'info',
+        action: 'call',
         status: 'pending',
         created_at: new Date().toISOString()
       };
 
-      // Dodaj polja za rezervaciju ako je action = 'reservation'
-      if (reservationData.action === 'reservation') {
-        Object.assign(data, {
-          check_in: reservationData.checkIn,
-          check_out: reservationData.checkOut,
-          room_type: reservationData.roomType,
-          guests: reservationData.guests || '1',
-          special_requests: reservationData.specialRequests || ''
-        });
-      }
-
       // Pokušavamo spremiti podatke
-      const tableName = reservationData.action === 'reservation' ? 'reservations' : 'contacts';
       const { error: insertError } = await supabase
-        .from(tableName)
+        .from('contacts')
         .insert([data]);
 
       if (insertError) {
@@ -439,7 +420,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-        <Image
+              <Image
                 src="https://i.imgur.com/xtE0obe.png"
                 alt="Ajdinovići Logo"
                 width={160}
