@@ -41,7 +41,7 @@ export default function Home() {
     checkOut: '',
     guests: '1',
     roomType: 'standard',
-    specialRequests: '',
+    message: '',
     country: '',
     action: ''
   });
@@ -313,15 +313,17 @@ export default function Home() {
         name: reservationData.name,
         phone: reservationData.phone,
         email: reservationData.email || '',
-        country: reservationData.country,
-        action: 'call',
+        check_in: reservationData.checkIn || null,
+        check_out: reservationData.checkOut || null,
+        guests: reservationData.guests || '1',
         status: 'pending',
+        message: reservationData.message || '',
         created_at: new Date().toISOString()
       };
 
-      // Pokušavamo spremiti podatke
+      // Pokušavamo spremiti podatke u reservations tabelu
       const { error: insertError } = await supabase
-        .from('contacts')
+        .from('reservations')
         .insert([data]);
 
       if (insertError) {
@@ -332,14 +334,6 @@ export default function Home() {
         throw new Error('Došlo je do greške prilikom slanja podataka. Molimo pokušajte ponovo.');
       }
       
-      // Pošalji SMS potvrdu
-      const message = formatReservationMessage(data);
-      const smsResult = await sendSMS(reservationData.phone, message);
-
-      if (!smsResult.success) {
-        console.error('SMS sending failed:', smsResult.error);
-      }
-      
       setFormStatus({ loading: false, success: true, error: null });
       
       // Reset form data
@@ -348,12 +342,11 @@ export default function Home() {
         email: '',
         phone: '',
         country: '',
-        action: '',
         checkIn: '',
         checkOut: '',
         roomType: '',
         guests: '1',
-        specialRequests: ''
+        message: ''
       });
       
       // Zatvori modal
@@ -1209,51 +1202,108 @@ export default function Home() {
                       name="email"
                       value={reservationData.email}
                       onChange={handleInputChange}
-                      required
                       className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="tel"
-                      placeholder="Broj telefona"
-                      name="phone"
-                      value={reservationData.phone}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Država"
-                      name="country"
-                      value={reservationData.country}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
-                    />
+                    <div className="relative">
+                      <select
+                        name="country"
+                        value={reservationData.country}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                      >
+                        <option value="">Izaberite državu</option>
+                        <option value="BiH">Bosna i Hercegovina (+387)</option>
+                        <option value="HR">Hrvatska (+385)</option>
+                        <option value="RS">Srbija (+381)</option>
+                        <option value="ME">Crna Gora (+382)</option>
+                        <option value="SI">Slovenija (+386)</option>
+                        <option value="other">Ostalo</option>
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500">
+                          {reservationData.country === 'BiH' ? '+387' :
+                           reservationData.country === 'HR' ? '+385' :
+                           reservationData.country === 'RS' ? '+381' :
+                           reservationData.country === 'ME' ? '+382' :
+                           reservationData.country === 'SI' ? '+386' : ''}
+                        </span>
+                      </div>
+                      <input
+                        type="tel"
+                        placeholder="Broj telefona"
+                        name="phone"
+                        value={reservationData.phone}
+                        onChange={handleInputChange}
+                        required
+                        className={`px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641] ${
+                          reservationData.country ? 'pl-16' : ''
+                        }`}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                       type="date"
-                      name="date"
-                      value={reservationData.date}
+                      name="checkIn"
+                      value={reservationData.checkIn}
                       onChange={handleInputChange}
                       required
                       min={new Date().toISOString().split('T')[0]}
                       className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                     />
                     <input
-                      type="time"
-                      name="time"
-                      value={reservationData.time}
+                      type="date"
+                      name="checkOut"
+                      value={reservationData.checkOut}
                       onChange={handleInputChange}
                       required
+                      min={reservationData.checkIn || new Date().toISOString().split('T')[0]}
                       className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select
+                      name="roomType"
+                      value={reservationData.roomType}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    >
+                      <option value="">Izaberite tip smještaja</option>
+                      <option value="apartment">Apartman</option>
+                      <option value="room">Soba</option>
+                      <option value="house">Kuća</option>
+                    </select>
+                    <select
+                      name="guests"
+                      value={reservationData.guests}
+                      onChange={handleInputChange}
+                      required
+                      className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
+                    >
+                      <option value="1">1 gost</option>
+                      <option value="2">2 gosta</option>
+                      <option value="3">3 gosta</option>
+                      <option value="4">4 gosta</option>
+                      <option value="5+">5+ gostiju</option>
+                    </select>
+                  </div>
+
+                  <textarea
+                    name="message"
+                    value={reservationData.message}
+                    onChange={handleInputChange}
+                    placeholder="Poruka ili posebni zahtjevi (opciono)"
+                    className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641] h-24"
+                  />
 
                   <div className="flex justify-center">
                     <button
@@ -1348,39 +1398,14 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Zahtjev uspješno poslat!</h3>
-                  <p className="text-gray-600">Naša recepcija će vas kontaktirati u najkraćem mogućem roku.</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Rezervacija uspješno poslana!</h3>
+                  <p className="text-gray-600">Naša recepcija će vas kontaktirati u najkraćem mogućem roku radi potvrde rezervacije.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
       </section>
-
-      {/* Live Comments Bar */}
-      {/* <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 py-3 z-40">
-        <div className="relative overflow-hidden">
-          <div className="animate-scroll flex space-x-8 whitespace-nowrap">
-            {[
-              "Marija, 68: 'Najljepši odmor od penzionisanja! Hrana je odlična, osoblje ljubazno.'",
-              "Petar, 72: 'Bila sam sama, sad imam društvo za cijeli život. Svaki dan je nova zabava!'",
-              "Ana, 65: 'Hrana kao kod moje majke, a sve spremno bez stresa. Osjećam se kao kod kuće.'",
-              "Stevan, 70: 'Tamburaši su odlični, a bingo je svaki dan! Nema dosade.'",
-              "Milica, 67: 'Fizioterapeut je odličan, pomogao mi je s leđima. Sada se bolje osjećam.'",
-              "Dragan, 71: 'Organizovani izleti su super. Vidjeli smo sve znamenitosti bez stresa.'",
-              "Jelena, 64: 'Sobe su čiste, hrana odlična, a društvo predivno. Vraćam se sigurno!'",
-              "Milan, 69: 'Prijevoz je bio udoban, a osoblje je pomoglo oko prtljage. Bez stresa!'",
-              "Ljubica, 66: 'Joga za penzionere je odlična. Održavam se u formi i družim se.'",
-              "Zoran, 73: 'Medicinski tim je dostupan 24/7. Osjećam se sigurno i zaštićeno.'"
-            ].map((comment, index) => (
-              <div key={index} className="inline-flex items-center text-gray-600 text-sm">
-                <span className="text-[#009641] mr-2">★</span>
-                {comment}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div> */}
 
       {/* Success Notification */}
       {formStatus.success && (
@@ -1394,8 +1419,8 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-gray-900">Zahtjev uspješno poslat!</h4>
-              <p className="text-sm text-gray-500">Naša recepcija će vas kontaktirati u najkraćem mogućem roku.</p>
+              <h4 className="text-sm font-medium text-gray-900">Rezervacija uspješno poslana!</h4>
+              <p className="text-sm text-gray-500">Naša recepcija će vas kontaktirati u najkraćem mogućem roku radi potvrde rezervacije.</p>
             </div>
           </div>
         </div>
