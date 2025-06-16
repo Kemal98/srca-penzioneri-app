@@ -309,21 +309,41 @@ export default function Home() {
         throw new Error('Molimo unesite ispravan broj telefona (npr. 0603422909 ili +387603422909)');
       }
 
-      const data = {
-        name: reservationData.name,
-        phone: reservationData.phone,
-        email: reservationData.email || '',
-        check_in: reservationData.checkIn || null,
-        check_out: reservationData.checkOut || null,
-        guests: reservationData.guests || '1',
-        status: 'pending',
-        message: reservationData.message || '',
-        created_at: new Date().toISOString()
-      };
+      // Ako je rezervacija, provjeri datume
+      if (formStatus.action === 'reservation') {
+        if (!reservationData.checkIn || !reservationData.checkOut) {
+          throw new Error('Molimo unesite datume dolaska i odlaska');
+        }
+      }
 
-      // Pokušavamo spremiti podatke u reservations tabelu
+      // Priprema podatke ovisno o tipu forme
+      let data;
+      if (formStatus.action === 'reservation') {
+        data = {
+          name: reservationData.name,
+          phone: reservationData.phone,
+          email: reservationData.email || '',
+          status: 'pending',
+          message: reservationData.message || '',
+          created_at: new Date().toISOString(),
+          check_in: reservationData.checkIn,
+          check_out: reservationData.checkOut,
+          guests: reservationData.guests || '1'
+        };
+      } else {
+        data = {
+          name: reservationData.name,
+          phone: reservationData.phone,
+          email: reservationData.email || '',
+          status: 'pending',
+          message: reservationData.message || '',
+          created_at: new Date().toISOString()
+        };
+      }
+
+      // Pokušavamo spremiti podatke u odgovarajuću tablicu
       const { error: insertError } = await supabase
-        .from('reservations')
+        .from(formStatus.action === 'reservation' ? 'reservations' : 'contacts')
         .insert([data]);
 
       if (insertError) {
@@ -466,10 +486,19 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-300 mt-4">
               <button
-                onClick={() => setShowAboutUs(true)}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105 hover:-translate-y-0.5 duration-300"
+                onClick={() => {
+                  const element = document.getElementById('about');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-8 py-3 bg-white text-[#009641] rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl"
               >
-                Saznaj više o nama
+                Saznaj više
+              </button>
+              <button
+                onClick={() => setShowReservationForm(true)}
+                className="px-8 py-3 bg-[#009641] text-white rounded-lg font-semibold hover:bg-[#009641]/90 transition-all shadow-lg hover:shadow-xl"
+              >
+                Zatraži ponudu odmah
               </button>
             </div>
           </div>
