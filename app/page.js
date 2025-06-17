@@ -486,10 +486,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-300 mt-4">
               <button
-                onClick={() => {
-                  const element = document.getElementById('about');
-                  element?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => setShowAboutUs(true)}
                 className="px-8 py-3 bg-white text-[#009641] rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl"
               >
                 Saznaj više
