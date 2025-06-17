@@ -1304,9 +1304,12 @@ export default function Home() {
                       className="px-4 py-3 rounded-lg text-sm w-full bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#009641] placeholder-gray-400 transition-all duration-300 hover:border-[#009641]"
                     >
                       <option value="">Izaberite tip smještaja</option>
-                      <option value="apartment">Apartman</option>
-                      <option value="room">Soba</option>
-                      <option value="house">Kuća</option>
+                      <option value="bungalovi">Bungalovi</option>
+                      <option value="planinske-kuce">Planinske kuće</option>
+                      <option value="vile">Vile</option>
+                      <option value="hotel-central">Hotel Central</option>
+                      <option value="hotel-depadanas">Hotel Depadanas</option>
+                      <option value="hotel-horizont">Hotel Horizont</option>
                     </select>
                     <select
                       name="guests"
